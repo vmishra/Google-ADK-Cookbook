@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Palantir-style presentation for Google ADK - a field tool for cloud architects.",
+  "description": "ADK, in motion — an interactive exhibit of the Agent Development Kit.",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
