@@ -1,0 +1,11 @@
+/* Geist, Geist Mono, Fraunces via @fontsource-hosted CDN.
+   All with display: block to avoid FOUT token jitter.  */
+
+@import url("https://cdn.jsdelivr.net/npm/@fontsource/geist-sans@5.0.1/400.css");
+@import url("https://cdn.jsdelivr.net/npm/@fontsource/geist-sans@5.0.1/500.css");
+@import url("https://cdn.jsdelivr.net/npm/@fontsource/geist-sans@5.0.1/600.css");
+@import url("https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.0.1/400.css");
+@import url("https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.0.1/500.css");
+@import url("https://cdn.jsdelivr.net/npm/@fontsource/fraunces@5.0.17/400.css");
+@import url("https://cdn.jsdelivr.net/npm/@fontsource/fraunces@5.0.17/500.css");
+@import url("https://cdn.jsdelivr.net/npm/@fontsource/fraunces@5.0.17/400-italic.css");

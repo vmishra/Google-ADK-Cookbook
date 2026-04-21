@@ -4,13 +4,15 @@ site_author: Vikas Mishra
 site_url: https://vmishra.github.io/Google-ADK-Cookbook/
 repo_url: https://github.com/vmishra/Google-ADK-Cookbook
 repo_name: vmishra/Google-ADK-Cookbook
-copyright: Copyright &copy; 2026 Vikas Mishra
+copyright: >-
+  Google ADK Cookbook · Vikas Mishra · Apache&nbsp;2.0
 
 docs_dir: docs
 
 theme:
   name: material
   language: en
+  custom_dir: docs/overrides
   palette:
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
@@ -26,25 +28,33 @@ theme:
       toggle:
         icon: material/weather-night
         name: Switch to dark
-  font:
-    text: Geist
-    code: Geist Mono
+  font: false
+  icon:
+    repo: fontawesome/brands/github
+    edit: material/pencil
+    admonition:
+      note: material/circle-medium
+      tip: material/circle-medium
+      warning: material/triangle-small-up
   features:
     - navigation.instant
+    - navigation.instant.progress
     - navigation.tracking
-    - navigation.tabs
     - navigation.sections
-    - navigation.expand
     - navigation.indexes
     - navigation.top
+    - navigation.footer
     - toc.follow
     - search.suggest
     - search.highlight
+    - search.share
     - content.code.copy
     - content.code.annotate
     - content.tabs.link
+    - content.tooltips
 
 markdown_extensions:
+  - abbr
   - admonition
   - attr_list
   - def_list
@@ -52,7 +62,9 @@ markdown_extensions:
   - md_in_html
   - tables
   - toc:
-      permalink: true
+      permalink: "¶"
+      permalink_title: Anchor
+      title: On this page
   - pymdownx.details
   - pymdownx.highlight:
       anchor_linenums: true
@@ -69,141 +81,169 @@ markdown_extensions:
       alternate_style: true
   - pymdownx.tasklist:
       custom_checkbox: true
+  - pymdownx.smartsymbols
+  - pymdownx.caret
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.keys
 
 extra_javascript:
-  - https://unpkg.com/mermaid@10/dist/mermaid.min.js
+  - https://unpkg.com/mermaid@11/dist/mermaid.min.js
   - assets/mermaid-init.js
 
 extra_css:
+  - https://rsms.me/inter/inter.css
+  - assets/fonts.css
   - assets/extra.css
+
+extra:
+  generator: false
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/vmishra/Google-ADK-Cookbook
+      name: Source on GitHub
 
 nav:
   - Home: index.md
-  - "00 Introduction":
-      - 00-introduction/index.md
-      - What is ADK: 00-introduction/what-is-adk.md
-      - Why ADK: 00-introduction/why-adk.md
-      - ADK vs LangChain/LangGraph: 00-introduction/adk-vs-langchain-langgraph.md
-      - Choosing the right framework: 00-introduction/choosing-the-right-framework.md
-  - "01 Getting started":
-      - 01-getting-started/index.md
-      - Installation: 01-getting-started/installation.md
-      - First agent: 01-getting-started/first-agent.md
-      - Project structure: 01-getting-started/project-structure.md
-      - CLI reference: 01-getting-started/cli-reference.md
-  - "02 Core concepts":
-      - 02-core-concepts/index.md
-      - Agents: 02-core-concepts/agents.md
-      - Tools: 02-core-concepts/tools.md
-      - Sessions: 02-core-concepts/sessions.md
-      - Memory: 02-core-concepts/memory.md
-      - Runner: 02-core-concepts/runner.md
-      - Events: 02-core-concepts/events.md
-      - Callbacks: 02-core-concepts/callbacks.md
-      - Artifacts: 02-core-concepts/artifacts.md
-  - "03 Agent types":
-      - 03-agent-types/index.md
-      - LLM agent: 03-agent-types/llm-agent.md
-      - Sequential agent: 03-agent-types/sequential-agent.md
-      - Parallel agent: 03-agent-types/parallel-agent.md
-      - Loop agent: 03-agent-types/loop-agent.md
-      - Custom agent: 03-agent-types/custom-agent.md
-  - "04 Tools":
-      - 04-tools/index.md
-      - Function tools: 04-tools/function-tools.md
-      - OpenAPI tools: 04-tools/openapi-tools.md
-      - MCP tools: 04-tools/mcp-tools.md
-      - Built-in tools: 04-tools/built-in-tools.md
-      - Long-running tools: 04-tools/long-running-tools.md
-      - Agent-as-tool: 04-tools/agent-as-tool.md
-  - "05 Skills":
-      - 05-skills/index.md
-      - Authoring a skill: 05-skills/authoring.md
-      - Progressive disclosure: 05-skills/progressive-disclosure.md
-      - Skill patterns: 05-skills/skill-patterns.md
-  - "06 Multimodal & Live":
-      - 06-multimodal/index.md
-      - Live API: 06-multimodal/live-api.md
-      - Voice agents: 06-multimodal/voice-agents.md
-      - Streaming: 06-multimodal/streaming.md
-      - Vision: 06-multimodal/vision.md
-      - Realtime bidi: 06-multimodal/realtime-bidi.md
-  - "07 Computer use":
-      - 07-computer-use/index.md
-      - Browser automation: 07-computer-use/browser-automation.md
-      - Safety loops: 07-computer-use/safety-loops.md
-  - "08 Deep research":
-      - 08-deep-research/index.md
-      - Planner/researcher/writer: 08-deep-research/planner-researcher-writer.md
-  - "09 Multi-agent":
-      - 09-multi-agent/index.md
-      - Coordinator pattern: 09-multi-agent/coordinator.md
-      - Delegation: 09-multi-agent/delegation.md
-      - A2A federation: 09-multi-agent/a2a-federation.md
-  - "10 Memory patterns":
-      - 10-memory-patterns/index.md
-      - Session state: 10-memory-patterns/session-state.md
-      - Vertex Memory Bank: 10-memory-patterns/vertex-memory-bank.md
-      - Compaction: 10-memory-patterns/compaction.md
-  - "11 Observability":
-      - 11-observability/index.md
-      - Tracing: 11-observability/tracing.md
-      - Dev UI: 11-observability/dev-ui.md
-  - "12 Evaluation":
-      - 12-evaluation/index.md
-      - Eval sets: 12-evaluation/eval-sets.md
-      - Metrics: 12-evaluation/metrics.md
-      - CI integration: 12-evaluation/ci-integration.md
-  - "13 Deployment":
-      - 13-deployment/index.md
-      - Agent Engine: 13-deployment/agent-engine.md
-      - Cloud Run: 13-deployment/cloud-run.md
-      - GKE: 13-deployment/gke.md
-  - "14 Safety":
-      - 14-safety/index.md
-      - Guardrails: 14-safety/guardrails.md
-      - Approval flows: 14-safety/approval-flows.md
-  - "15 Cost & latency":
-      - 15-cost-latency/index.md
-      - Caching: 15-cost-latency/caching.md
-      - Model routing: 15-cost-latency/model-routing.md
-  - "16 Interop":
-      - 16-interop/index.md
-      - MCP: 16-interop/mcp.md
-      - A2A: 16-interop/a2a.md
-      - LangChain/LangGraph bridge: 16-interop/langchain-langgraph-bridge.md
-  - "17 Comparisons":
-      - 17-comparisons/index.md
-      - ADK vs LangChain: 17-comparisons/adk-vs-langchain.md
-      - ADK vs LangGraph: 17-comparisons/adk-vs-langgraph.md
-      - ADK vs CrewAI: 17-comparisons/adk-vs-crewai.md
-      - ADK vs AutoGen: 17-comparisons/adk-vs-autogen.md
-  - "18 Case studies":
-      - 18-case-studies/index.md
-      - Support triage: 18-case-studies/support-triage.md
-      - Research assistant: 18-case-studies/research-assistant.md
-      - Voice concierge: 18-case-studies/voice-concierge.md
-  - "19 Harness platform":
-      - 19-harness-platform/index.md
-      - Building a harness: 19-harness-platform/building-a-harness.md
-      - Plugin architecture: 19-harness-platform/plugin-architecture.md
-      - Custom services: 19-harness-platform/custom-services.md
-      - Multi-tenant: 19-harness-platform/multi-tenant.md
-      - Harness patterns: 19-harness-platform/harness-patterns.md
-      - Coding assistant harness: 19-harness-platform/coding-assistant-harness.md
-  - Patterns:
-      - patterns/index.md
-      - Context engineering: patterns/context-engineering.md
-      - Session rewind: patterns/session-rewind.md
-      - Compaction: patterns/compaction.md
-      - Circuit breakers: patterns/circuit-breakers.md
-      - Confidence gate: patterns/confidence-gate.md
-      - Harness plugin composition: patterns/harness-plugin-composition.md
-  - Cheatsheets:
-      - cheatsheets/index.md
-      - Imports: cheatsheets/imports.md
-      - CLI: cheatsheets/cli.md
-      - Models: cheatsheets/models.md
-      - State prefixes: cheatsheets/state-prefixes.md
-      - Services: cheatsheets/services.md
-  - Reference: reference/index.md
+
+  - Start:
+      - "00 · Introduction":
+          - 00-introduction/index.md
+          - What is ADK: 00-introduction/what-is-adk.md
+          - Why ADK: 00-introduction/why-adk.md
+          - ADK vs LangChain/LangGraph: 00-introduction/adk-vs-langchain-langgraph.md
+          - Choosing the right framework: 00-introduction/choosing-the-right-framework.md
+      - "01 · Getting started":
+          - 01-getting-started/index.md
+          - Installation: 01-getting-started/installation.md
+          - First agent: 01-getting-started/first-agent.md
+          - Project structure: 01-getting-started/project-structure.md
+          - CLI reference: 01-getting-started/cli-reference.md
+
+  - Concepts:
+      - "02 · Core concepts":
+          - 02-core-concepts/index.md
+          - Agents: 02-core-concepts/agents.md
+          - Tools: 02-core-concepts/tools.md
+          - Sessions: 02-core-concepts/sessions.md
+          - Memory: 02-core-concepts/memory.md
+          - Runner: 02-core-concepts/runner.md
+          - Events: 02-core-concepts/events.md
+          - Callbacks: 02-core-concepts/callbacks.md
+          - Artifacts: 02-core-concepts/artifacts.md
+      - "03 · Agent types":
+          - 03-agent-types/index.md
+          - LLM agent: 03-agent-types/llm-agent.md
+          - Sequential agent: 03-agent-types/sequential-agent.md
+          - Parallel agent: 03-agent-types/parallel-agent.md
+          - Loop agent: 03-agent-types/loop-agent.md
+          - Custom agent: 03-agent-types/custom-agent.md
+      - "04 · Tools":
+          - 04-tools/index.md
+          - Function tools: 04-tools/function-tools.md
+          - OpenAPI tools: 04-tools/openapi-tools.md
+          - MCP tools: 04-tools/mcp-tools.md
+          - Built-in tools: 04-tools/built-in-tools.md
+          - Long-running tools: 04-tools/long-running-tools.md
+          - Agent-as-tool: 04-tools/agent-as-tool.md
+      - "05 · Skills":
+          - 05-skills/index.md
+          - Authoring a skill: 05-skills/authoring.md
+          - Progressive disclosure: 05-skills/progressive-disclosure.md
+          - Skill patterns: 05-skills/skill-patterns.md
+
+  - Capabilities:
+      - "06 · Multimodal & Live":
+          - 06-multimodal/index.md
+          - Live API: 06-multimodal/live-api.md
+          - Voice agents: 06-multimodal/voice-agents.md
+          - Streaming: 06-multimodal/streaming.md
+          - Vision: 06-multimodal/vision.md
+          - Realtime bidi: 06-multimodal/realtime-bidi.md
+      - "07 · Computer use":
+          - 07-computer-use/index.md
+          - Browser automation: 07-computer-use/browser-automation.md
+          - Safety loops: 07-computer-use/safety-loops.md
+      - "08 · Deep research":
+          - 08-deep-research/index.md
+          - Planner/researcher/writer: 08-deep-research/planner-researcher-writer.md
+
+  - Systems:
+      - "09 · Multi-agent":
+          - 09-multi-agent/index.md
+          - Coordinator pattern: 09-multi-agent/coordinator.md
+          - Delegation: 09-multi-agent/delegation.md
+          - A2A federation: 09-multi-agent/a2a-federation.md
+      - "10 · Memory patterns":
+          - 10-memory-patterns/index.md
+          - Session state: 10-memory-patterns/session-state.md
+          - Vertex Memory Bank: 10-memory-patterns/vertex-memory-bank.md
+          - Compaction: 10-memory-patterns/compaction.md
+      - "11 · Observability":
+          - 11-observability/index.md
+          - Tracing: 11-observability/tracing.md
+          - Dev UI: 11-observability/dev-ui.md
+      - "12 · Evaluation":
+          - 12-evaluation/index.md
+          - Eval sets: 12-evaluation/eval-sets.md
+          - Metrics: 12-evaluation/metrics.md
+          - CI integration: 12-evaluation/ci-integration.md
+
+  - Ship:
+      - "13 · Deployment":
+          - 13-deployment/index.md
+          - Agent Engine: 13-deployment/agent-engine.md
+          - Cloud Run: 13-deployment/cloud-run.md
+          - GKE: 13-deployment/gke.md
+      - "14 · Safety":
+          - 14-safety/index.md
+          - Guardrails: 14-safety/guardrails.md
+          - Approval flows: 14-safety/approval-flows.md
+      - "15 · Cost & latency":
+          - 15-cost-latency/index.md
+          - Caching: 15-cost-latency/caching.md
+          - Model routing: 15-cost-latency/model-routing.md
+
+  - Extend:
+      - "16 · Interop":
+          - 16-interop/index.md
+          - MCP: 16-interop/mcp.md
+          - A2A: 16-interop/a2a.md
+          - LangChain/LangGraph bridge: 16-interop/langchain-langgraph-bridge.md
+      - "17 · Comparisons":
+          - 17-comparisons/index.md
+          - ADK vs LangChain: 17-comparisons/adk-vs-langchain.md
+          - ADK vs LangGraph: 17-comparisons/adk-vs-langgraph.md
+          - ADK vs CrewAI: 17-comparisons/adk-vs-crewai.md
+          - ADK vs AutoGen: 17-comparisons/adk-vs-autogen.md
+      - "18 · Case studies":
+          - 18-case-studies/index.md
+          - Support triage: 18-case-studies/support-triage.md
+          - Research assistant: 18-case-studies/research-assistant.md
+          - Voice concierge: 18-case-studies/voice-concierge.md
+      - "19 · Harness platform":
+          - 19-harness-platform/index.md
+          - Building a harness: 19-harness-platform/building-a-harness.md
+          - Plugin architecture: 19-harness-platform/plugin-architecture.md
+          - Custom services: 19-harness-platform/custom-services.md
+          - Multi-tenant: 19-harness-platform/multi-tenant.md
+          - Harness patterns: 19-harness-platform/harness-patterns.md
+          - Coding assistant harness: 19-harness-platform/coding-assistant-harness.md
+
+  - Reference:
+      - Patterns:
+          - patterns/index.md
+          - Context engineering: patterns/context-engineering.md
+          - Session rewind: patterns/session-rewind.md
+          - Compaction: patterns/compaction.md
+          - Circuit breakers: patterns/circuit-breakers.md
+          - Confidence gate: patterns/confidence-gate.md
+          - Harness plugin composition: patterns/harness-plugin-composition.md
+      - Cheatsheets:
+          - cheatsheets/index.md
+          - Imports: cheatsheets/imports.md
+          - CLI: cheatsheets/cli.md
+          - Models: cheatsheets/models.md
+          - State prefixes: cheatsheets/state-prefixes.md
+          - Services: cheatsheets/services.md
+      - External sources: reference/index.md

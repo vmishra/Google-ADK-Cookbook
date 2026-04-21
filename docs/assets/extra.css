@@ -1,66 +1,469 @@
-/* Editorial finish on top of MkDocs Material. */
+/* ========================================================================
+   Google ADK Cookbook — editorial theme on top of MkDocs Material.
+   Built to the house design system:
+     - Dark-first warm near-blacks, champagne accent (OKLCH)
+     - Geist for UI, Fraunces italic for editorial, Geist Mono for code
+     - Tabular numerals, hairline accents, restrained motion
+   ======================================================================== */
 
 :root {
-  --md-accent-fg-color: #c9a45a;
-  --md-primary-fg-color: #0f0f12;
-  --mono-feature: "tnum", "cv11";
+  /* Champagne accent is load-bearing — do not override per-surface. */
+  --adk-accent:         oklch(80% 0.130 85);
+  --adk-accent-soft:    oklch(80% 0.130 85 / 0.14);
+  --adk-accent-hair:    oklch(80% 0.130 85 / 0.55);
+  --adk-trace:          oklch(72% 0.075 200);
+  --adk-trace-soft:     oklch(72% 0.075 200 / 0.14);
+  --adk-danger:         oklch(68% 0.150 25);
+  --adk-success:        oklch(72% 0.110 160);
+
+  /* Shadows: inset highlight + diffuse drop. Never hard. */
+  --adk-shadow-1: 0 1px 0 oklch(100% 0 0 / 0.04) inset,
+                  0 1px 2px oklch(0% 0 0 / 0.45);
+  --adk-shadow-2: 0 1px 0 oklch(100% 0 0 / 0.06) inset,
+                  0 6px 24px -8px oklch(0% 0 0 / 0.6);
+  --adk-shadow-lift: 0 1px 0 oklch(100% 0 0 / 0.08) inset,
+                     0 18px 48px -16px oklch(0% 0 0 / 0.7);
+
+  /* Numeric rhythm */
+  --adk-mono-feature: "tnum", "cv11";
 }
 
-/* Tabular numerals everywhere */
-.md-typeset code,
-.md-typeset pre,
-table td,
-table th {
-  font-feature-settings: var(--mono-feature);
+/* Dark (default) ---------------------------------------------------------- */
+[data-md-color-scheme="slate"] {
+  --md-default-bg-color:         oklch(14% 0.010 260);
+  --md-default-bg-color--light:  oklch(17% 0.012 260);
+  --md-default-bg-color--lighter:oklch(19% 0.012 260);
+  --md-default-bg-color--lightest:oklch(23% 0.014 260);
+
+  --md-default-fg-color:         oklch(96% 0 0);
+  --md-default-fg-color--light:  oklch(68% 0.010 260);
+  --md-default-fg-color--lighter:oklch(52% 0.010 260);
+  --md-default-fg-color--lightest: oklch(28% 0.012 260);
+
+  --md-primary-fg-color:         oklch(14% 0.010 260);
+  --md-primary-fg-color--dark:   oklch(10% 0.008 260);
+  --md-primary-bg-color:         oklch(96% 0 0);
+  --md-primary-bg-color--light:  oklch(68% 0.010 260);
+
+  --md-accent-fg-color:          var(--adk-accent);
+  --md-accent-fg-color--transparent: var(--adk-accent-soft);
+  --md-accent-bg-color:          oklch(14% 0 0);
+  --md-accent-bg-color--light:   oklch(18% 0 0);
+
+  --md-typeset-a-color:          var(--adk-accent);
+  --md-code-bg-color:            oklch(17% 0.012 260);
+  --md-code-fg-color:            oklch(92% 0.010 85);
+  --md-code-hl-color:            var(--adk-accent-soft);
+
+  --md-footer-bg-color:          oklch(11% 0.010 260);
+  --md-footer-bg-color--dark:    oklch(9% 0.008 260);
+  --md-footer-fg-color:          oklch(68% 0.010 260);
+  --md-footer-fg-color--light:   oklch(52% 0.010 260);
+  --md-footer-fg-color--lighter: oklch(42% 0.010 260);
+}
+
+/* Light (sibling, not inverse) ------------------------------------------- */
+[data-md-color-scheme="default"] {
+  --md-default-bg-color:         oklch(98% 0.004 80);
+  --md-default-bg-color--light:  oklch(99% 0.003 80);
+  --md-default-bg-color--lighter:oklch(96% 0.004 80);
+  --md-default-bg-color--lightest:oklch(93% 0.005 80);
+
+  --md-default-fg-color:         oklch(18% 0.005 260);
+  --md-default-fg-color--light:  oklch(42% 0.010 260);
+  --md-default-fg-color--lighter:oklch(58% 0.010 260);
+  --md-default-fg-color--lightest: oklch(88% 0.005 80);
+
+  --md-primary-fg-color:         oklch(98% 0.004 80);
+  --md-primary-bg-color:         oklch(18% 0.005 260);
+
+  --md-accent-fg-color:          oklch(58% 0.130 65);
+  --md-accent-fg-color--transparent: oklch(58% 0.130 65 / 0.12);
+  --md-accent-bg-color:          oklch(99% 0.003 80);
+
+  --md-typeset-a-color:          oklch(52% 0.130 65);
+  --md-code-bg-color:            oklch(96% 0.005 80);
+  --md-code-fg-color:            oklch(22% 0.010 260);
+}
+
+/* Typography -------------------------------------------------------------- */
+html, body, .md-typeset {
+  font-family: "Geist", "Geist Fallback", ui-sans-serif, system-ui,
+               -apple-system, "Segoe UI", sans-serif;
+  font-feature-settings: "cv11";
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+code, pre, kbd, .md-typeset code, .md-typeset pre,
+.md-nav__link code, table code {
+  font-family: "Geist Mono", ui-monospace, "SF Mono",
+               "JetBrains Mono", Menlo, Consolas, monospace;
+  font-feature-settings: var(--adk-mono-feature);
   font-variant-numeric: tabular-nums;
 }
 
-/* Calmer headings */
-.md-typeset h1,
-.md-typeset h2,
-.md-typeset h3 {
+/* Headings quieter weight — editorial not app-busy */
+.md-typeset h1, .md-typeset h2, .md-typeset h3, .md-typeset h4 {
   font-weight: 500;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.012em;
+  line-height: 1.12;
+}
+.md-typeset h1 { font-size: 2.35rem; margin: 0 0 1.25rem; }
+.md-typeset h2 { font-size: 1.55rem; margin: 2.25rem 0 0.9rem; }
+.md-typeset h3 { font-size: 1.18rem; margin: 1.6rem 0 0.55rem; }
+
+/* Signature champagne hairline under H1 */
+.md-typeset h1::after {
+  content: "";
+  display: block;
+  width: 180px; max-width: 40%;
+  height: 1px;
+  margin: 0.9rem 0 1.4rem;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--adk-accent-hair) 18%,
+    var(--adk-accent-hair) 82%,
+    transparent 100%);
 }
 
 /* Editorial kicker used in chapter headers */
 .kicker {
+  display: inline-block;
+  font-family: "Geist Mono", ui-monospace, monospace;
   font-size: 11px;
+  font-weight: 500;
   letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: var(--md-default-fg-color--light);
-  font-family: "Geist Mono", ui-monospace, monospace;
+  color: var(--md-default-fg-color--lighter);
+  margin: 0 0 0.75rem;
 }
 
-/* Mermaid diagrams: give them breathing room and a hairline. */
-.mermaid {
-  padding: 20px;
+/* Body text comfort */
+.md-typeset { font-size: 0.88rem; line-height: 1.65; }
+.md-typeset p { margin: 0 0 0.9em; }
+
+/* Tabular numerals everywhere that matters */
+.md-typeset table td,
+.md-typeset table th,
+.md-typeset dl dd,
+.numeric, [data-numeric] {
+  font-feature-settings: var(--adk-mono-feature);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Links --------------------------------------------------------- */
+.md-typeset a {
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in oklab, var(--md-typeset-a-color) 40%, transparent);
+  transition: border-color 160ms ease, color 160ms ease;
+}
+.md-typeset a:hover {
+  color: var(--md-accent-fg-color);
+  border-bottom-color: currentColor;
+}
+
+/* Header ---------------------------------------------------------- */
+.md-header {
+  backdrop-filter: saturate(1.15) blur(10px);
+  -webkit-backdrop-filter: saturate(1.15) blur(10px);
+  background: color-mix(in oklab, var(--md-default-bg-color) 78%, transparent);
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+  box-shadow: none;
+}
+.md-header__title { font-weight: 500; letter-spacing: -0.01em; }
+.md-search__input { font-family: inherit; }
+.md-search__input::placeholder { font-family: inherit; }
+
+/* Sidebar nav ----------------------------------------------------- */
+.md-nav { font-size: 13.5px; }
+.md-nav__title {
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--md-default-fg-color--lighter);
+  padding-top: 1.25rem;
+}
+.md-nav__item .md-nav__link--active,
+.md-nav__link:focus,
+.md-nav__link:hover {
+  color: var(--md-accent-fg-color);
+}
+.md-nav__item--section > .md-nav__link {
+  font-weight: 500;
+  color: var(--md-default-fg-color);
+}
+.md-nav__link { padding: 0.28rem 0; }
+.md-sidebar__scrollwrap { scrollbar-width: thin; }
+
+/* Content surfaces -------------------------------------------------- */
+.md-content {
+  padding-top: 0.6rem;
+}
+.md-main__inner { margin-top: 0.75rem; }
+.md-content__inner::before { display: none; }
+
+/* Rounded panels for admonitions + quotes */
+.md-typeset .admonition,
+.md-typeset details {
   border: 1px solid var(--md-default-fg-color--lightest);
   border-radius: 12px;
-  background: var(--md-default-bg-color);
-  margin: 24px 0;
+  box-shadow: var(--adk-shadow-1);
+  background: var(--md-default-bg-color--lighter);
+}
+.md-typeset .admonition > .admonition-title,
+.md-typeset details > summary {
+  font-weight: 500;
 }
 
-/* Subtle hairline under chapter titles */
-.md-typeset h1::after {
-  content: "";
-  display: block;
-  width: 140px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, #c9a45a 25%, #c9a45a 75%, transparent);
-  margin: 12px 0 24px 0;
-}
-
-/* Comparison tables */
-.md-typeset table:not([class]) {
-  font-size: 14px;
+/* Blockquotes — editorial pull quote */
+.md-typeset blockquote {
+  font-family: "Fraunces", Georgia, serif;
+  font-style: italic;
+  font-size: 1.05em;
   line-height: 1.55;
+  color: var(--md-default-fg-color--light);
+  border-left: 1px solid var(--adk-accent-hair);
+  padding: 0.25rem 0 0.25rem 1rem;
+  margin-left: 0;
 }
 
-/* Callout tones */
-.md-typeset .admonition.why {
-  border-color: #c9a45a;
+/* Tables ---------------------------------------------------------- */
+.md-typeset table:not([class]) {
+  font-size: 13.5px;
+  line-height: 1.55;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--adk-shadow-1);
 }
-.md-typeset .why > .admonition-title::before {
-  background-color: #c9a45a;
+.md-typeset table:not([class]) th {
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--md-default-fg-color--lighter);
+  background: var(--md-default-bg-color--lighter);
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+}
+.md-typeset table:not([class]) td {
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+}
+.md-typeset table:not([class]) tr:last-child td { border-bottom: none; }
+
+/* Code blocks ----------------------------------------------------- */
+.md-typeset pre > code {
+  font-size: 12.8px;
+  line-height: 1.55;
+  border-radius: 12px;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  box-shadow: var(--adk-shadow-1);
+}
+.highlight .filename, .md-clipboard {
+  color: var(--md-default-fg-color--lighter);
+}
+.md-typeset .highlight span.linenos,
+.md-typeset .highlight .lineno {
+  color: var(--md-default-fg-color--lightest);
+  border-right-color: var(--md-default-fg-color--lightest);
+}
+
+/* Mermaid diagrams ------------------------------------------------ */
+.mermaid {
+  padding: 20px;
+  border-radius: 14px;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  background: var(--md-default-bg-color--lighter);
+  box-shadow: var(--adk-shadow-2);
+  margin: 24px 0;
+  overflow-x: auto;
+}
+.mermaid svg { max-width: 100%; height: auto; }
+
+/* Chips and kbd keys --------------------------------------------- */
+.md-typeset kbd, .md-typeset .key {
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: 11.5px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  background: var(--md-default-bg-color--lighter);
+  box-shadow: 0 1px 0 oklch(0% 0 0 / 0.3);
+}
+
+/* Footer --------------------------------------------------------- */
+.md-footer {
+  border-top: 1px solid var(--md-default-fg-color--lightest);
+}
+.md-footer-meta { font-size: 12px; }
+
+/* Home page hero -------------------------------------------------- */
+.adk-hero {
+  position: relative;
+  margin: 0 0 3rem;
+  padding: 4.25rem 0 3.5rem;
+  text-align: center;
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+  isolation: isolate;
+}
+.adk-hero::before {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(
+      60% 60% at 50% 0%,
+      color-mix(in oklab, var(--adk-accent) 8%, transparent) 0%,
+      transparent 70%);
+  pointer-events: none;
+  z-index: -1;
+}
+.adk-hero__kicker {
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.36em;
+  text-transform: uppercase;
+  color: var(--md-default-fg-color--lighter);
+  margin-bottom: 1.2rem;
+}
+.adk-hero__title {
+  font-family: "Fraunces", "Geist", serif;
+  font-weight: 400;
+  font-size: clamp(2.6rem, 6vw, 4.4rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  margin: 0 0 1rem;
+  color: var(--md-default-fg-color);
+}
+.adk-hero__title .accent {
+  font-style: italic;
+  color: var(--adk-accent);
+  font-weight: 500;
+}
+.adk-hero__sub {
+  font-family: "Fraunces", Georgia, serif;
+  font-style: italic;
+  font-size: clamp(1.05rem, 1.4vw, 1.25rem);
+  line-height: 1.5;
+  color: var(--md-default-fg-color--light);
+  max-width: 56ch;
+  margin: 0 auto 1.8rem;
+}
+.adk-hero__rule {
+  width: 240px; height: 1px; margin: 0 auto 1.8rem;
+  background: linear-gradient(
+    90deg,
+    transparent, var(--adk-accent-hair) 20%,
+    var(--adk-accent-hair) 80%, transparent);
+  transform-origin: center;
+  animation: adk-rule 1.4s cubic-bezier(.2,.7,.2,1) both;
+}
+@keyframes adk-rule {
+  from { transform: scaleX(0); opacity: 0; }
+  to   { transform: scaleX(1); opacity: 1; }
+}
+.adk-hero__capabilities {
+  display: flex; flex-wrap: wrap; justify-content: center;
+  gap: 0 1.25rem;
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--md-default-fg-color--lighter);
+  margin-bottom: 2rem;
+}
+.adk-hero__capabilities span { display: inline-flex; align-items: center; }
+.adk-hero__capabilities span + span::before {
+  content: "·";
+  margin-right: 1.25rem;
+  color: var(--md-default-fg-color--lightest);
+}
+.adk-hero__cta {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-family: "Geist", sans-serif;
+  font-weight: 500; font-size: 13px;
+  letter-spacing: 0.02em;
+  padding: 0.65rem 1.25rem;
+  border-radius: 999px;
+  border: 1px solid var(--adk-accent);
+  color: var(--adk-accent);
+  background: transparent;
+  transition: background-color 220ms ease, color 220ms ease;
+  position: relative;
+}
+.adk-hero__cta:hover {
+  background: var(--adk-accent-soft);
+  color: var(--adk-accent);
+  border-bottom: 1px solid var(--adk-accent);
+}
+.adk-hero__meta {
+  display: inline-flex; gap: 1.5rem;
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--md-default-fg-color--lighter);
+  margin-top: 2rem;
+}
+.adk-hero__meta b {
+  color: var(--md-default-fg-color);
+  font-weight: 500;
+}
+
+/* Cluster cards on the home page --------------------------------- */
+.adk-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+  margin: 1.5rem 0 2.5rem;
+}
+.adk-card {
+  display: block;
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  background: var(--md-default-bg-color--lighter);
+  box-shadow: var(--adk-shadow-1);
+  text-decoration: none !important;
+  border-bottom: 1px solid var(--md-default-fg-color--lightest) !important;
+  transition: transform 220ms cubic-bezier(.2,.7,.2,1),
+              border-color 220ms ease,
+              background-color 220ms ease;
+}
+.adk-card:hover {
+  transform: translateY(-1px);
+  border-color: var(--adk-accent-hair) !important;
+  background: var(--md-default-bg-color--lightest);
+}
+.adk-card__kicker {
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--adk-accent);
+  margin-bottom: 0.5rem;
+}
+.adk-card__title {
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--md-default-fg-color);
+  margin: 0 0 0.35rem;
+  letter-spacing: -0.01em;
+}
+.adk-card__body {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--md-default-fg-color--light);
+  margin: 0;
+}
+
+/* Reduced motion --------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
