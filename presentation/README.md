@@ -1,14 +1,19 @@
-# Google ADK · presented
+# ADK, in motion
 
-A field tool for Google Cloud architects. A fast, animated,
-single-page presentation of what ADK is and what it can do — built
-for the moment a customer asks *"show me what this does."*
+An interactive exhibit of the Agent Development Kit. A surface you
+explore rather than read.
 
-Not a slide deck. A live surface.
+Half the screen narrates; the other half renders the concept as a
+living diagram — data moving, agents talking, state changing in
+real time. Press <kbd>V</kbd> and a single request walks through
+every primitive, turn by turn, as one cinematic sequence.
+
+Three depths are hidden inside each scene. The surface is simple.
+The next two layers unfold when you ask.
 
 ---
 
-## Run locally
+## Run
 
 ```bash
 cd presentation
@@ -22,65 +27,58 @@ Open http://localhost:5173.
 
 ```bash
 npm run build      # static output in presentation/dist/
-npm run preview    # serve the build locally
+npm run preview
 ```
 
-The build is static. Host on GitHub Pages, Cloud Storage + CDN,
-or drop it on Vercel/Netlify.
+Pure static. Host anywhere.
 
 ## Structure
 
 ```
 presentation/
-  index.html                 Font preloads, dark-first
+  index.html
   src/
-    main.tsx                 Entry
-    App.tsx                  Shell + slide router
-    styles/
-      tokens.css             OKLCH palette (DESIGN.md §2)
-      globals.css            Base styles, fonts, reset
-    lib/
-      motion.ts              Spring presets (DESIGN.md §4.2)
-      cn.ts                  Class composition helper
-    state/
-      useSlideStore.ts       Zustand store: slide, level, playing
+    main.tsx
+    App.tsx
+    styles/            tokens.css · globals.css
+    lib/               motion presets, utilities
+    state/             slide + level + play mode
     components/
-      primitives/            Button, Chip, Panel, Kbd (DESIGN.md §9)
-      shell/                 Topbar, Sidebar, dual-pane Shell
-      diagrams/              Animated arrow + node + flow primitives
-      video/                 Scene controller for Play Video mode
-    slides/                  One file per slide
+      primitives/      Button, Chip, Panel, Kbd, StatusDot
+      shell/           Topbar, Sidebar, CommandPalette, Shell, Slide
+      diagrams/        Canvas, Node, Edge, Annotation, CodeCard
+      video/           scenes storyboard + VideoStage
+    slides/            fourteen scenes, one file each
 ```
 
-## Design contract
+## Keyboard
 
-This sub-app follows `/Users/vikas/Desktop/Project/Agentic-Concierge/DESIGN.md`
-as a specification. Notable rules:
+| Key | Effect |
+|---|---|
+| <kbd>→</kbd> / <kbd>←</kbd> | Next / previous scene |
+| <kbd>1</kbd> / <kbd>2</kbd> / <kbd>3</kbd> | Depth — beginner · intermediate · advanced |
+| <kbd>V</kbd> | Toggle the traced-request sequence |
+| <kbd>Space</kbd> | Inside trace mode: pause / resume |
+| <kbd>R</kbd> | Restart the trace |
+| <kbd>⌘</kbd><kbd>K</kbd> | Jump to any scene |
+| <kbd>Esc</kbd> | Close overlays |
 
-- OKLCH for every colour. One accent (champagne, hue ~85).
-- Geist for UI, Fraunces italic for editorial, Geist Mono for numerics.
-- Springs, not curves. `stiffness: 260, damping: 28, mass: 0.6`.
-- No emoji, no exclamation marks, no sparkle icons.
-- Progressive disclosure. Levels: beginner → intermediate → advanced.
-- Restraint is the signature.
+## Deploy
 
-## Levels
+The output is a plain static bundle under `dist/`. Three paths:
 
-Each slide supports three levels:
+- **GitHub Pages.** Add a workflow that runs `npm ci && npm run build`
+  and uploads `dist/` as a Pages artifact. Set `base: "/your-repo/"`
+  in `vite.config.ts` if you are not at the site root.
+- **Cloud Storage + CDN.** Sync `dist/` to a bucket; front with
+  Cloud CDN. Cache assets aggressively; `index.html` with no-cache.
+- **Any static host.** Netlify, Vercel, Cloudflare Pages —
+  point at the repo, `dist/` is the publish directory.
 
-- **Beginner** — one concept, one animation, minimal legend.
-- **Intermediate** — adds state flow, callbacks, event stream.
-- **Advanced** — the full harness perspective: plugins, services,
-  per-tenant policy, A2A federation.
+## Design
 
-Switch with the level picker in the topbar or with `1` / `2` / `3`.
-
-## Play Video
-
-Press `V` or click the Play pill in the topbar. The canvas switches
-to a cinematic sequence that walks a single request through every
-ADK primitive — user message → runner → session → coordinator →
-specialist → tool → memory → response. Code samples surface at the
-right beats; the left pane narrates.
-
-The timeline is scrubbable. Pause, rewind, replay any scene.
+Every value follows
+`/Users/vikas/Desktop/Project/Agentic-Concierge/DESIGN.md`: OKLCH
+palette, single warm champagne accent, Geist for UI with Fraunces
+italic reserved for editorial moments, springs not curves, no emoji,
+no exclamation marks, progressive disclosure.

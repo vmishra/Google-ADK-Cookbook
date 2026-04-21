@@ -24,6 +24,11 @@ Everything is plain Markdown. The repo compiles to a single static site
 with MkDocs Material (`mkdocs serve`) or Docusaurus. You can also read it
 straight on GitHub.
 
+There is also a **[presentation/](presentation/)** sub-app — an
+interactive, animated exhibit of ADK rendered as living diagrams,
+including a *trace-a-request* cinematic that walks one message
+through every primitive in the framework.
+
 ---
 
 ## Who it is for
