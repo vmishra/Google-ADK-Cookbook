@@ -1,0 +1,2 @@
+google-adk>=1.31,<2
+crewai-tools>=0.12
