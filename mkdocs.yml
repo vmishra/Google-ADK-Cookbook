@@ -1,0 +1,177 @@
+site_name: Google ADK Cookbook
+site_description: A practitioner's reference for building, orchestrating, and shipping agents with Google's Agent Development Kit.
+site_author: Vikas Mishra
+site_url: https://vmishra.github.io/Google-ADK-Cookbook/
+repo_url: https://github.com/vmishra/Google-ADK-Cookbook
+repo_name: vmishra/Google-ADK-Cookbook
+copyright: Copyright &copy; 2026 Vikas Mishra
+
+docs_dir: docs
+
+theme:
+  name: material
+  language: en
+  palette:
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: amber
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: black
+      accent: amber
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark
+  font:
+    text: Geist
+    code: Geist Mono
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.indexes
+    - navigation.top
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+nav:
+  - Home: index.md
+  - "00 Introduction":
+      - docs/00-introduction/index.md
+      - What is ADK: docs/00-introduction/what-is-adk.md
+      - Why ADK: docs/00-introduction/why-adk.md
+      - ADK vs LangChain/LangGraph: docs/00-introduction/adk-vs-langchain-langgraph.md
+      - Choosing the right framework: docs/00-introduction/choosing-the-right-framework.md
+  - "01 Getting started":
+      - docs/01-getting-started/index.md
+      - Installation: docs/01-getting-started/installation.md
+      - First agent: docs/01-getting-started/first-agent.md
+      - Project structure: docs/01-getting-started/project-structure.md
+      - CLI reference: docs/01-getting-started/cli-reference.md
+  - "02 Core concepts":
+      - docs/02-core-concepts/index.md
+      - Agents: docs/02-core-concepts/agents.md
+      - Tools: docs/02-core-concepts/tools.md
+      - Sessions: docs/02-core-concepts/sessions.md
+      - Memory: docs/02-core-concepts/memory.md
+      - Runner: docs/02-core-concepts/runner.md
+      - Events: docs/02-core-concepts/events.md
+      - Callbacks: docs/02-core-concepts/callbacks.md
+      - Artifacts: docs/02-core-concepts/artifacts.md
+  - "03 Agent types":
+      - docs/03-agent-types/index.md
+      - LLM agent: docs/03-agent-types/llm-agent.md
+      - Sequential agent: docs/03-agent-types/sequential-agent.md
+      - Parallel agent: docs/03-agent-types/parallel-agent.md
+      - Loop agent: docs/03-agent-types/loop-agent.md
+      - Custom agent: docs/03-agent-types/custom-agent.md
+  - "04 Tools":
+      - docs/04-tools/index.md
+      - Function tools: docs/04-tools/function-tools.md
+      - OpenAPI tools: docs/04-tools/openapi-tools.md
+      - MCP tools: docs/04-tools/mcp-tools.md
+      - Built-in tools: docs/04-tools/built-in-tools.md
+      - Long-running tools: docs/04-tools/long-running-tools.md
+      - Agent-as-tool: docs/04-tools/agent-as-tool.md
+  - "05 Skills":
+      - docs/05-skills/index.md
+      - Authoring a skill: docs/05-skills/authoring.md
+      - Progressive disclosure: docs/05-skills/progressive-disclosure.md
+      - Skill patterns: docs/05-skills/skill-patterns.md
+  - "06 Multimodal & Live":
+      - docs/06-multimodal/index.md
+      - Live API: docs/06-multimodal/live-api.md
+      - Voice agents: docs/06-multimodal/voice-agents.md
+      - Streaming: docs/06-multimodal/streaming.md
+      - Vision: docs/06-multimodal/vision.md
+      - Realtime bidi: docs/06-multimodal/realtime-bidi.md
+  - "07 Computer use":
+      - docs/07-computer-use/index.md
+      - Browser automation: docs/07-computer-use/browser-automation.md
+      - Safety loops: docs/07-computer-use/safety-loops.md
+  - "08 Deep research":
+      - docs/08-deep-research/index.md
+      - Planner/researcher/writer: docs/08-deep-research/planner-researcher-writer.md
+  - "09 Multi-agent":
+      - docs/09-multi-agent/index.md
+      - Coordinator pattern: docs/09-multi-agent/coordinator.md
+      - Delegation: docs/09-multi-agent/delegation.md
+      - A2A federation: docs/09-multi-agent/a2a-federation.md
+  - "10 Memory patterns":
+      - docs/10-memory-patterns/index.md
+      - Session state: docs/10-memory-patterns/session-state.md
+      - Vertex Memory Bank: docs/10-memory-patterns/vertex-memory-bank.md
+      - Compaction: docs/10-memory-patterns/compaction.md
+  - "11 Observability":
+      - docs/11-observability/index.md
+      - Tracing: docs/11-observability/tracing.md
+      - Dev UI: docs/11-observability/dev-ui.md
+  - "12 Evaluation":
+      - docs/12-evaluation/index.md
+      - Eval sets: docs/12-evaluation/eval-sets.md
+      - Metrics: docs/12-evaluation/metrics.md
+      - CI integration: docs/12-evaluation/ci-integration.md
+  - "13 Deployment":
+      - docs/13-deployment/index.md
+      - Agent Engine: docs/13-deployment/agent-engine.md
+      - Cloud Run: docs/13-deployment/cloud-run.md
+      - GKE: docs/13-deployment/gke.md
+  - "14 Safety":
+      - docs/14-safety/index.md
+      - Guardrails: docs/14-safety/guardrails.md
+      - Approval flows: docs/14-safety/approval-flows.md
+  - "15 Cost & latency":
+      - docs/15-cost-latency/index.md
+      - Caching: docs/15-cost-latency/caching.md
+      - Model routing: docs/15-cost-latency/model-routing.md
+  - "16 Interop":
+      - docs/16-interop/index.md
+      - MCP: docs/16-interop/mcp.md
+      - A2A: docs/16-interop/a2a.md
+      - LangChain/LangGraph bridge: docs/16-interop/langchain-langgraph-bridge.md
+  - "17 Comparisons":
+      - docs/17-comparisons/index.md
+      - ADK vs LangChain: docs/17-comparisons/adk-vs-langchain.md
+      - ADK vs LangGraph: docs/17-comparisons/adk-vs-langgraph.md
+      - ADK vs CrewAI: docs/17-comparisons/adk-vs-crewai.md
+      - ADK vs AutoGen: docs/17-comparisons/adk-vs-autogen.md
+  - "18 Case studies":
+      - docs/18-case-studies/index.md
+      - Support triage: docs/18-case-studies/support-triage.md
+      - Research assistant: docs/18-case-studies/research-assistant.md
+      - Voice concierge: docs/18-case-studies/voice-concierge.md
+  - Patterns: patterns/index.md
+  - Cheatsheets: cheatsheets/index.md
+  - Reference: reference/index.md
