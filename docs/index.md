@@ -68,8 +68,8 @@ came before it:
   weekend of reading; a week if you run every example.
 - **Picking a topic.** Use the sidebar. Every chapter has its own index
   page with a one-paragraph summary and a jump list.
-- **Pattern lookup.** [Patterns](patterns/index.md) and
-  [Cheatsheets](cheatsheets/index.md) are terse — they assume you have
+- **Pattern lookup.** [Patterns](patterns/) and
+  [Cheatsheets](cheatsheets/) are terse — they assume you have
   read the corresponding chapter.
 
 ## Authoritative sources

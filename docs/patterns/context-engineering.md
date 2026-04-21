@@ -42,7 +42,7 @@ flowchart TB
 - **Pay attention to order.** Recent items dominate. Put the
   user's message last, not in the middle.
 - **Compact before the history gets long.** See
-  [Chapter 10 — Compaction](../docs/10-memory-patterns/compaction.md).
+  [Chapter 10 — Compaction](../10-memory-patterns/compaction.md).
 - **Make retrieved context traceable.** If a memory or document
   shaped an answer, the event log should show it.
 
