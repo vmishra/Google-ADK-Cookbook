@@ -1,0 +1,101 @@
+/* =========================================================================
+   Design tokens — strictly OKLCH. Dark-first.
+   This file is the first contract: anything rendered reads from here.
+   Do NOT hard-code colour in a component. See DESIGN.md §2.
+   ========================================================================= */
+
+:root[data-theme="dark"],
+:root {
+  /* Surfaces */
+  --surface:            oklch(14% 0.010 260);
+  --surface-raised:     oklch(17% 0.012 260);
+  --elev-1:             oklch(19% 0.012 260);
+  --elev-2:             oklch(23% 0.014 260);
+
+  /* Borders */
+  --border:             oklch(28% 0.012 260);
+  --border-strong:      oklch(36% 0.014 260);
+
+  /* Text */
+  --text:               oklch(96% 0 0);
+  --text-muted:         oklch(68% 0.010 260);
+  --text-subtle:        oklch(52% 0.010 260);
+  --text-faint:         oklch(38% 0.010 260);
+
+  /* Accents — one load-bearing hue. */
+  --accent:             oklch(80% 0.130 85);
+  --accent-soft:        oklch(80% 0.130 85 / 0.14);
+  --accent-hairline:    oklch(80% 0.130 85 / 0.55);
+  --accent-deep:        oklch(62% 0.135 85);
+
+  /* Secondary informational only. Never equal weight with accent. */
+  --trace:              oklch(72% 0.075 200);
+  --trace-soft:         oklch(72% 0.075 200 / 0.14);
+  --trace-hairline:     oklch(72% 0.075 200 / 0.55);
+
+  /* Semantic */
+  --danger:             oklch(68% 0.150 25);
+  --success:            oklch(72% 0.110 160);
+
+  /* Radii */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
+
+  /* Shadows — inset highlight + diffuse drop. Never hard. */
+  --shadow-1:
+    0 1px 0 oklch(100% 0 0 / 0.04) inset,
+    0 1px 2px oklch(0% 0 0 / 0.40);
+  --shadow-2:
+    0 1px 0 oklch(100% 0 0 / 0.06) inset,
+    0 6px 24px -8px oklch(0% 0 0 / 0.60);
+  --shadow-lift:
+    0 1px 0 oklch(100% 0 0 / 0.08) inset,
+    0 18px 48px -16px oklch(0% 0 0 / 0.70);
+
+  /* Fonts */
+  --font-sans:    "Geist", "Geist Fallback", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono:    "Geist Mono", ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  --font-serif:   "Fraunces", ui-serif, Georgia, serif;
+
+  /* Tabular-nums feature set */
+  --numeric-feature: "tnum", "cv11";
+}
+
+/* Light is a sibling palette, not an inversion. */
+:root[data-theme="light"] {
+  --surface:            oklch(98% 0.004 80);
+  --surface-raised:     oklch(99% 0.003 80);
+  --elev-1:             oklch(96% 0.004 80);
+  --elev-2:             oklch(93% 0.005 80);
+
+  --border:             oklch(90% 0.006 80);
+  --border-strong:      oklch(82% 0.008 80);
+
+  --text:               oklch(18% 0.005 260);
+  --text-muted:         oklch(42% 0.010 260);
+  --text-subtle:        oklch(58% 0.010 260);
+  --text-faint:         oklch(72% 0.010 260);
+
+  --accent:             oklch(58% 0.130 65);
+  --accent-soft:        oklch(58% 0.130 65 / 0.12);
+  --accent-hairline:    oklch(58% 0.130 65 / 0.45);
+  --accent-deep:        oklch(44% 0.135 65);
+
+  --trace:              oklch(48% 0.090 200);
+  --trace-soft:         oklch(48% 0.090 200 / 0.12);
+  --trace-hairline:     oklch(48% 0.090 200 / 0.45);
+
+  --shadow-1:
+    0 1px 0 oklch(100% 0 0 / 0.60) inset,
+    0 1px 2px oklch(0% 0 0 / 0.08);
+  --shadow-2:
+    0 1px 0 oklch(100% 0 0 / 0.70) inset,
+    0 6px 24px -8px oklch(0% 0 0 / 0.12);
+  --shadow-lift:
+    0 1px 0 oklch(100% 0 0 / 0.80) inset,
+    0 18px 48px -16px oklch(0% 0 0 / 0.18);
+}
