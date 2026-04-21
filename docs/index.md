@@ -90,13 +90,14 @@ quotes the source directly.
 
 | Layer | Version | Notes |
 |---|---|---|
-| ADK Python | 1.25+ | The examples use APIs available on 1.25 and later. |
+| ADK Python | 1.31.1 | Released 2026-04-21. Examples target 1.30+. |
 | ADK TypeScript | 1.x | Called out where the Python path diverges. |
 | ADK Go / Java | 1.0+ | Referenced in Chapter 16 (Interop). |
-| Gemini default | `gemini-2.5-flash` | Chosen for the cost–latency balance most chapters want. |
-| Gemini reasoning | `gemini-2.5-pro` | Used in deep research, planning, and hard tool-use. |
+| Gemini default | `gemini-2.5-flash` | The cost–latency balance most chapters want. |
+| Gemini reasoning | `gemini-2.5-pro` | Deep research, planning, hard tool-use. |
 | Gemini computer-use | `gemini-2.5-computer-use-preview-10-2025` | Preview. Chapter 7. |
-| Gemini live | `gemini-live-2.5-flash-preview` | Preview. Chapter 6. |
+| Gemini live (Vertex) | `gemini-live-2.5-flash-native-audio` | Chapter 6. |
+| Gemini live (API) | `gemini-2.5-flash-native-audio-preview-12-2025` | Chapter 6. |
 
 If a model or API has moved by the time you read this, treat the chapter
 text as the authoritative statement of *intent* and consult the linked

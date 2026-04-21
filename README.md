@@ -167,9 +167,9 @@ framework-agnostic.
 - Copy avoids exclamation marks, marketing language, and cheerleader
   phrasing — on the principle that anyone reading this has seen enough
   of those elsewhere.
-- Model IDs used in examples are current as of April 2026. When a
-  model is in *preview*, the chapter says so and the example falls back
-  to a GA model if the preview model is not enabled.
+- Model IDs used in examples are current as of April 2026 (ADK Python
+  1.31.1). When a model is in *preview*, the chapter says so and the
+  example falls back to a GA model if the preview model is not enabled.
 
 ---
 
