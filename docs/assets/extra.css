@@ -1,0 +1,66 @@
+/* Editorial finish on top of MkDocs Material. */
+
+:root {
+  --md-accent-fg-color: #c9a45a;
+  --md-primary-fg-color: #0f0f12;
+  --mono-feature: "tnum", "cv11";
+}
+
+/* Tabular numerals everywhere */
+.md-typeset code,
+.md-typeset pre,
+table td,
+table th {
+  font-feature-settings: var(--mono-feature);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Calmer headings */
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3 {
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+/* Editorial kicker used in chapter headers */
+.kicker {
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--md-default-fg-color--light);
+  font-family: "Geist Mono", ui-monospace, monospace;
+}
+
+/* Mermaid diagrams: give them breathing room and a hairline. */
+.mermaid {
+  padding: 20px;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 12px;
+  background: var(--md-default-bg-color);
+  margin: 24px 0;
+}
+
+/* Subtle hairline under chapter titles */
+.md-typeset h1::after {
+  content: "";
+  display: block;
+  width: 140px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #c9a45a 25%, #c9a45a 75%, transparent);
+  margin: 12px 0 24px 0;
+}
+
+/* Comparison tables */
+.md-typeset table:not([class]) {
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+/* Callout tones */
+.md-typeset .admonition.why {
+  border-color: #c9a45a;
+}
+.md-typeset .why > .admonition-title::before {
+  background-color: #c9a45a;
+}
