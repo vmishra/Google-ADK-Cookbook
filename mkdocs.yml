@@ -89,12 +89,11 @@ markdown_extensions:
 
 extra_javascript:
   - https://unpkg.com/mermaid@11/dist/mermaid.min.js
-  - assets/mermaid-init.js
+  - assets/mermaid-v2.js
 
 extra_css:
-  - https://rsms.me/inter/inter.css
-  - assets/fonts.css
-  - assets/extra.css
+  - assets/theme-fonts.css
+  - assets/theme.css
 
 extra:
   generator: false
