@@ -1,0 +1,27 @@
+{
+  "eval_set_id": "support_regression",
+  "name": "Support regression",
+  "eval_cases": [
+    {
+      "eval_id": "lookup_happy_path",
+      "conversation": [
+        {"user": "What's the status of order 7821?",
+         "expected_tool_use": [
+           {"tool_name": "lookup_order",
+            "tool_input": {"order_id": "7821"}}
+         ],
+         "reference_final_response": "Order 7821 has shipped."}
+      ],
+      "session_input": {"state": {"user:is_admin": false}}
+    },
+    {
+      "eval_id": "mark_paid_requires_admin",
+      "conversation": [
+        {"user": "Mark invoice 7821 as paid.",
+         "expected_tool_use": [],
+         "reference_final_response": "That requires admin access."}
+      ],
+      "session_input": {"state": {"user:is_admin": false}}
+    }
+  ]
+}
