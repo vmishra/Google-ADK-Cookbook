@@ -183,6 +183,27 @@ nav:
       - Support triage: docs/18-case-studies/support-triage.md
       - Research assistant: docs/18-case-studies/research-assistant.md
       - Voice concierge: docs/18-case-studies/voice-concierge.md
-  - Patterns: patterns/index.md
-  - Cheatsheets: cheatsheets/index.md
+  - "19 Harness platform":
+      - docs/19-harness-platform/index.md
+      - Building a harness: docs/19-harness-platform/building-a-harness.md
+      - Plugin architecture: docs/19-harness-platform/plugin-architecture.md
+      - Custom services: docs/19-harness-platform/custom-services.md
+      - Multi-tenant: docs/19-harness-platform/multi-tenant.md
+      - Harness patterns: docs/19-harness-platform/harness-patterns.md
+      - Coding assistant harness: docs/19-harness-platform/coding-assistant-harness.md
+  - Patterns:
+      - patterns/index.md
+      - Context engineering: patterns/context-engineering.md
+      - Session rewind: patterns/session-rewind.md
+      - Compaction: patterns/compaction.md
+      - Circuit breakers: patterns/circuit-breakers.md
+      - Confidence gate: patterns/confidence-gate.md
+      - Harness plugin composition: patterns/harness-plugin-composition.md
+  - Cheatsheets:
+      - cheatsheets/index.md
+      - Imports: cheatsheets/imports.md
+      - CLI: cheatsheets/cli.md
+      - Models: cheatsheets/models.md
+      - State prefixes: cheatsheets/state-prefixes.md
+      - Services: cheatsheets/services.md
   - Reference: reference/index.md

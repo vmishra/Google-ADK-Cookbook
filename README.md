@@ -81,6 +81,7 @@ Three passes, in order of depth:
 | 16 | [Interop](docs/16-interop/) | MCP, A2A, LangChain/LangGraph/CrewAI bridges |
 | 17 | [Comparisons](docs/17-comparisons/) | ADK vs LangChain, LangGraph, CrewAI, AutoGen |
 | 18 | [Case studies](docs/18-case-studies/) | Real-world use cases and architectures |
+| 19 | [Harness platform](docs/19-harness-platform/) | Using ADK to build agent platforms, harnesses, orchestration runtimes |
 
 ---
 
