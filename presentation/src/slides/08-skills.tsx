@@ -2,7 +2,6 @@ import { motion } from "motion/react";
 import { Slide } from "@/components/shell/Slide";
 import { Canvas } from "@/components/diagrams/Canvas";
 import { Node } from "@/components/diagrams/Node";
-import { Edge } from "@/components/diagrams/Edge";
 import { useSlideStore } from "@/state/useSlideStore";
 import { spring } from "@/lib/motion";
 
