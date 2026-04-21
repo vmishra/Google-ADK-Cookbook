@@ -24,11 +24,13 @@ hide:
     <span>Computer use</span>
     <span>A2A</span>
   </div>
-  <a href="00-introduction/" class="adk-hero__cta">Begin with Chapter 0 →</a>
+  <div class="adk-hero__ctarow">
+    <a href="00-introduction/" class="adk-hero__cta">Begin with Chapter 0 →</a>
+  </div>
   <div class="adk-hero__meta">
-    <span>ADK&nbsp;Python <b>1.31.1</b></span>
-    <span>Gemini <b>2.5 · Flash · Pro · Live · Computer-use</b></span>
-    <span><b>20</b> runnable examples</span>
+    <span>ADK&nbsp;Python&nbsp;<b>1.31.1</b></span>
+    <span>Gemini&nbsp;<b>2.5 · Flash · Pro · Live · Computer-use</b></span>
+    <span><b>20</b>&nbsp;runnable&nbsp;examples</span>
   </div>
 </div>
 
