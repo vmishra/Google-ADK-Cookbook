@@ -144,10 +144,10 @@ export function MetricsRibbon({ baseUrl, lastTurn }: Props) {
         {primary.map((c) => (
           <div key={c.label} className="px-3 py-2 flex-1 min-w-0">
             <div className="flex items-baseline justify-between gap-2">
-              <span className="text-[10.5px] tracking-[0.22em] uppercase font-[var(--font-mono)] text-[var(--text-subtle)]">
+              <span className="text-[10.5px] tracking-[0.22em] uppercase font-[var(--font-mono)] text-[var(--text-muted)] font-medium">
                 {c.label}
               </span>
-              <span className="text-[10px] text-[var(--text-faint)] font-[var(--font-mono)]">
+              <span className="text-[10px] text-[var(--text-subtle)] font-[var(--font-mono)]">
                 {c.hint}
               </span>
             </div>
@@ -161,10 +161,10 @@ export function MetricsRibbon({ baseUrl, lastTurn }: Props) {
         {secondary.map((c) => (
           <div key={c.label} className="px-3 py-1.5 flex-1 min-w-0">
             <div className="flex items-baseline justify-between gap-2">
-              <span className="text-[9.5px] tracking-[0.22em] uppercase font-[var(--font-mono)] text-[var(--text-subtle)]">
+              <span className="text-[9.5px] tracking-[0.22em] uppercase font-[var(--font-mono)] text-[var(--text-muted)] font-medium">
                 {c.label}
               </span>
-              <span className="text-[13px] font-[var(--font-mono)] tabular-nums text-[var(--text-muted)] truncate">
+              <span className="text-[13px] font-[var(--font-mono)] font-medium tabular-nums text-[var(--text)] truncate">
                 {c.value}
               </span>
             </div>
