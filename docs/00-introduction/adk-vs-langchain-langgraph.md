@@ -98,7 +98,7 @@ The same agent, three ways. A dice-roller that uses two tools.
     def check_prime(n: int) -> bool:
         return n > 1 and all(n % i for i in range(2, int(n**0.5) + 1))
 
-    llm = ChatGoogleGenerativeAI(model="gemini-3.1-flash")
+    llm = ChatGoogleGenerativeAI(model="gemini-3-flash-preview")
     prompt = ChatPromptTemplate.from_messages([
         ("system", "Roll and explain."),
         ("user", "{input}"), ("placeholder", "{agent_scratchpad}")])
@@ -122,7 +122,7 @@ The same agent, three ways. A dice-roller that uses two tools.
 
     class S(TypedDict): messages: Annotated[list, "append"]
 
-    model = ChatGoogleGenerativeAI(model="gemini-3.1-flash").bind_tools(
+    model = ChatGoogleGenerativeAI(model="gemini-3-flash-preview").bind_tools(
         [roll_die, check_prime])
     def agent(s): return {"messages": [model.invoke(s["messages"])]}
     def cont(s):  return "tools" if s["messages"][-1].tool_calls else END
@@ -148,7 +148,7 @@ The same agent, three ways. A dice-roller that uses two tools.
     def check_prime(n: int) -> bool:
         return n > 1 and all(n % i for i in range(2, int(n**0.5) + 1))
 
-    root = LlmAgent(name="roller", model="gemini-3.1-flash",
+    root = LlmAgent(name="roller", model="gemini-3-flash-preview",
                     tools=[roll_die, check_prime])
     runner = InMemoryRunner(agent=root, app_name="demo")
     sess = await runner.session_service.create_session(

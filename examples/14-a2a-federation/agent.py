@@ -18,7 +18,7 @@ sre = RemoteA2aAgent(
 
 root_agent = LlmAgent(
     name="root",
-    model="gemini-3.1-flash",
+    model="gemini-3-flash-preview",
     description="Top-level agent that routes incident questions to SRE.",
     instruction=(
         "For anything about outages, alerts, or runbooks, transfer to sre. "

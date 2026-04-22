@@ -52,7 +52,7 @@ function OneAgentDiagram({ level }: { level: "beginner" | "intermediate" | "adva
       <Canvas>
         <Node x={200} y={220} kind="user" title="User" subtitle='"roll a d20"' />
         <Node x={520} y={220} kind="agent" tone="accent" active
-              title="LlmAgent" subtitle="gemini-3.1-flash" />
+              title="LlmAgent" subtitle="gemini-3-flash-preview" />
         <Node x={820} y={220} kind="tool" tone="trace"
               title="roll_die(sides)" subtitle="Python function" />
 
@@ -82,7 +82,7 @@ function OneAgentDiagram({ level }: { level: "beginner" | "intermediate" | "adva
 
 root_agent = LlmAgent(
     name="roller",
-    model="gemini-3.1-flash",
+    model="gemini-3-flash-preview",
     instruction="Roll, then explain.",
     tools=[roll_die],
     before_tool_callback=log_tool,

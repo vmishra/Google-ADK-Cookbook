@@ -27,7 +27,7 @@ weather_skill = load_skill_from_dir(
 
 root_agent = LlmAgent(
     name="assistant",
-    model="gemini-3.1-pro",
+    model="gemini-3.1-pro-preview",
     instruction="Follow the weather skill when the user's question is weather-related.",
     tools=[SkillToolset(skills=[weather_skill], tools=[get_weather])],
 )

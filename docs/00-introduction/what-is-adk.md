@@ -115,7 +115,7 @@ from google.adk.agents import LlmAgent
 
 root = LlmAgent(
     name="weather_agent",
-    model="gemini-3.1-flash",
+    model="gemini-3-flash-preview",
     description="Answers weather questions for a city.",
     instruction="You are a concise weather assistant. Use the get_weather tool.",
     tools=[get_weather],
@@ -275,7 +275,7 @@ def before_tool(tool, args, tool_context):
         return {"blocked": True, "reason": "irreversible action"}
 
 root = LlmAgent(
-    name="root", model="gemini-3.1-flash",
+    name="root", model="gemini-3-flash-preview",
     tools=[delete_account],
     before_tool_callback=before_tool,
 )
@@ -314,7 +314,7 @@ from google.adk.tools.skill_toolset import SkillToolset
 weather = load_skill_from_dir("./skills/weather")
 root = LlmAgent(
     name="assistant",
-    model="gemini-3.1-pro",
+    model="gemini-3.1-pro-preview",
     tools=[SkillToolset(skills=[weather])],
 )
 ```

@@ -17,7 +17,7 @@ class ReceiptFields(BaseModel):
 
 root_agent = LlmAgent(
     name="receipt_analyzer",
-    model="gemini-3.1-pro",
+    model="gemini-3.1-pro-preview",
     description="Extracts fields from a receipt image.",
     instruction=(
         "Given an image of a receipt, extract merchant name, total, tip, "

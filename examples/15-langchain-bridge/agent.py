@@ -17,7 +17,7 @@ adk_tool = LangchainTool(tool=lc_tool)
 
 root_agent = LlmAgent(
     name="shopping",
-    model="gemini-3.1-flash",
+    model="gemini-3-flash-preview",
     description="Finds products in a small demo catalogue.",
     instruction="Call search_catalogue and return the names briefly.",
     tools=[adk_tool],

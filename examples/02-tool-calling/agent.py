@@ -42,7 +42,7 @@ def list_recent(tool_context: ToolContext) -> dict:
 
 root_agent = LlmAgent(
     name="invoice_agent",
-    model="gemini-3.1-flash",
+    model="gemini-3-flash-preview",
     description="Answers invoice questions.",
     instruction=(
         "You help with invoice questions. Use lookup_invoice for status, "

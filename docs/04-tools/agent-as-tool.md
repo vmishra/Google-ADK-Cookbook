@@ -41,14 +41,14 @@ from google.adk.tools.agent_tool import AgentTool
 
 translator = LlmAgent(
     name="translator",
-    model="gemini-3.1-flash",
+    model="gemini-3-flash-preview",
     instruction="Translate the input to French. Return only the translation.",
 )
 
 
 root_agent = LlmAgent(
     name="editor",
-    model="gemini-3.1-pro",
+    model="gemini-3.1-pro-preview",
     instruction="You write short blog posts. When a user wants French, use the translator tool.",
     tools=[AgentTool(agent=translator)],
 )

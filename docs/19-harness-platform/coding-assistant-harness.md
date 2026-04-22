@@ -65,7 +65,7 @@ def request_approval(action: str, reason: str) -> dict:
 
 coding_agent = LlmAgent(
     name="coding_agent",
-    model="gemini-3.1-pro",
+    model="gemini-3.1-pro-preview",
     instruction="""
 You are a coding assistant operating in the user's workspace.
 You have access to read/write files, run commands, and call git.

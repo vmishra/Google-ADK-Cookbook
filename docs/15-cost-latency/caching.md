@@ -15,7 +15,7 @@ from google.genai import types
 from google.adk.agents import LlmAgent
 
 root_agent = LlmAgent(
-    name="support", model="gemini-3.1-flash",
+    name="support", model="gemini-3-flash-preview",
     instruction=LONG_SHARED_INSTRUCTION,    # 1000+ tokens
     generate_content_config=types.GenerateContentConfig(
         cached_content=True,    # enable caching of the instruction

@@ -14,7 +14,7 @@ class Plan(BaseModel):
 
 planner = LlmAgent(
     name="planner",
-    model="gemini-3.1-pro",
+    model="gemini-3.1-pro-preview",
     instruction=(
         "Break the user's question into 3 concrete steps. "
         "Pick a tone: 'technical', 'conversational', or 'formal'. "
@@ -25,7 +25,7 @@ planner = LlmAgent(
 
 researcher = LlmAgent(
     name="researcher",
-    model="gemini-3.1-flash",
+    model="gemini-3-flash-preview",
     instruction=(
         "For each step in state['plan'].steps, write a two-line note "
         "from your own knowledge. Concatenate into state['notes']."),
@@ -34,7 +34,7 @@ researcher = LlmAgent(
 
 writer = LlmAgent(
     name="writer",
-    model="gemini-3.1-pro",
+    model="gemini-3.1-pro-preview",
     instruction=(
         "Using state['plan'] and state['notes'], write a 150-word answer. "
         "Match the tone in state['plan'].tone."),

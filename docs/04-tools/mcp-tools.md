@@ -44,7 +44,7 @@ notion_headers = (
 
 root_agent = LlmAgent(
     name="notion_agent",
-    model="gemini-3.1-flash",
+    model="gemini-3-flash-preview",
     instruction="You are my workspace assistant. Use the Notion tools.",
     tools=[MCPToolset(connection_params=StdioServerParameters(
         command="npx",

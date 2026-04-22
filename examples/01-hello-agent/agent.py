@@ -28,7 +28,7 @@ def check_prime(n: int) -> bool:
 
 root_agent = LlmAgent(
     name="hello_agent",
-    model="gemini-3.1-flash",
+    model="gemini-3-flash-preview",
     description="Rolls dice and checks primality.",
     instruction=(
         "You are a concise assistant. When the user asks for a roll, "

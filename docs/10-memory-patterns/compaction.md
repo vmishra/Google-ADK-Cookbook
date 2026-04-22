@@ -44,7 +44,7 @@ async def compact_if_long(cc: CallbackContext):
         return
 
     summariser = LlmAgent(
-        name="compactor", model="gemini-3.1-flash",
+        name="compactor", model="gemini-3-flash-preview",
         instruction="Summarise the conversation so far in 300 words, "
                     "preserving every fact the user asked us to remember.")
     summary = await run_and_collect(summariser, history[:-10])

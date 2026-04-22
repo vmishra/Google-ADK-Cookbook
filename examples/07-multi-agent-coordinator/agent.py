@@ -20,19 +20,19 @@ def start_return(order_id: str) -> dict:
 
 
 billing = LlmAgent(
-    name="billing", model="gemini-3.1-flash",
+    name="billing", model="gemini-3-flash-preview",
     description="Answers billing questions: invoices, charges, refunds.",
     instruction="Use lookup_invoice. Be brief.",
     tools=[lookup_invoice])
 
 tech = LlmAgent(
-    name="tech_support", model="gemini-3.1-flash",
+    name="tech_support", model="gemini-3-flash-preview",
     description="Diagnoses technical problems with the product.",
     instruction="Use check_logs when an outage is reported. Be brief.",
     tools=[check_logs])
 
 returns = LlmAgent(
-    name="returns", model="gemini-3.1-flash",
+    name="returns", model="gemini-3-flash-preview",
     description="Handles return requests and RMAs.",
     instruction="Use start_return. Be brief.",
     tools=[start_return])
@@ -40,7 +40,7 @@ returns = LlmAgent(
 
 root_agent = LlmAgent(
     name="coordinator",
-    model="gemini-3.1-flash",
+    model="gemini-3-flash-preview",
     description="Routes user to the right specialist.",
     instruction=(
         "Classify the user's request and transfer to billing, tech_support, "

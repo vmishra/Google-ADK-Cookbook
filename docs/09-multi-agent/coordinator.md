@@ -26,7 +26,7 @@ from google.adk.agents import LlmAgent
 
 billing = LlmAgent(
     name="billing",
-    model="gemini-3.1-flash",
+    model="gemini-3-flash-preview",
     description="Answers questions about invoices, charges, and refunds.",
     instruction="...",
     tools=[lookup_invoice, mark_paid],
@@ -34,7 +34,7 @@ billing = LlmAgent(
 
 tech = LlmAgent(
     name="tech_support",
-    model="gemini-3.1-flash",
+    model="gemini-3-flash-preview",
     description="Diagnoses technical problems with the product.",
     instruction="...",
     tools=[lookup_logs, restart_service],
@@ -42,7 +42,7 @@ tech = LlmAgent(
 
 returns = LlmAgent(
     name="returns",
-    model="gemini-3.1-flash",
+    model="gemini-3-flash-preview",
     description="Handles return requests and RMA processing.",
     instruction="...",
     tools=[start_return, check_return_status],
@@ -50,7 +50,7 @@ returns = LlmAgent(
 
 root_agent = LlmAgent(
     name="coordinator",
-    model="gemini-3.1-flash",
+    model="gemini-3-flash-preview",
     description="Routes the user to the correct specialist.",
     instruction=(
         "You are the front desk. Classify the user's request, then "

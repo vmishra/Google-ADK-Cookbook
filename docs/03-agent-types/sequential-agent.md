@@ -31,7 +31,7 @@ class Plan(BaseModel):
 
 planner = LlmAgent(
     name="planner",
-    model="gemini-3.1-pro",
+    model="gemini-3.1-pro-preview",
     instruction=(
         "Break the user's question into 3-5 specific research steps. "
         "Return JSON matching the Plan schema."),
@@ -41,7 +41,7 @@ planner = LlmAgent(
 
 researcher = LlmAgent(
     name="researcher",
-    model="gemini-3.1-flash",
+    model="gemini-3-flash-preview",
     instruction=(
         "Execute each step in state['plan'].steps using google_search. "
         "Collect concise notes into state['notes']."),
@@ -51,7 +51,7 @@ researcher = LlmAgent(
 
 writer = LlmAgent(
     name="writer",
-    model="gemini-3.1-pro",
+    model="gemini-3.1-pro-preview",
     instruction=(
         "Using state['notes'] and the user question, write a 200-word "
         "answer that cites each source inline."),

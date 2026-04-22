@@ -30,7 +30,7 @@ from google.adk.tools import google_search
 
 web = LlmAgent(
     name="web_search",
-    model="gemini-3.1-flash",
+    model="gemini-3-flash-preview",
     instruction="Search the web for recent coverage. Write 3-5 bullets to state['web_notes'].",
     tools=[google_search],
     output_key="web_notes",
@@ -38,7 +38,7 @@ web = LlmAgent(
 
 kb = LlmAgent(
     name="kb_search",
-    model="gemini-3.1-flash",
+    model="gemini-3-flash-preview",
     instruction="Search the internal KB for canonical answers. Write to state['kb_notes'].",
     tools=[kb_lookup],
     output_key="kb_notes",
@@ -46,7 +46,7 @@ kb = LlmAgent(
 
 sql = LlmAgent(
     name="sql_search",
-    model="gemini-3.1-flash",
+    model="gemini-3-flash-preview",
     instruction="Query the events DB for incidents in the last 30 days. Write state['sql_notes'].",
     tools=[run_sql],
     output_key="sql_notes",
@@ -56,7 +56,7 @@ fan_out = ParallelAgent(name="fan_out", sub_agents=[web, kb, sql])
 
 reviewer = LlmAgent(
     name="reviewer",
-    model="gemini-3.1-pro",
+    model="gemini-3.1-pro-preview",
     instruction=(
         "You have state['web_notes'], state['kb_notes'], state['sql_notes']. "
         "Reconcile them and write a single answer. Cite every fact."),
@@ -86,7 +86,7 @@ and emits a partial state. The reviewer needs to handle missing keys:
 ```python
 reviewer = LlmAgent(
     name="reviewer",
-    model="gemini-3.1-pro",
+    model="gemini-3.1-pro-preview",
     instruction=(
         "You may or may not have state['web_notes'], state['kb_notes'], "
         "state['sql_notes']. Reconcile whichever are present. "

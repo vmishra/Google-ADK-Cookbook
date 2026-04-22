@@ -189,7 +189,7 @@ sre_agent = RemoteA2aAgent(
     name="sre",
     agent_card="https://sre.internal/a2a/agent-card",
 )
-root = LlmAgent(name="root", model="gemini-3.1-flash",
+root = LlmAgent(name="root", model="gemini-3-flash-preview",
                 sub_agents=[sre_agent])
 ```
 

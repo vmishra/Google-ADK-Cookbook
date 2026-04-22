@@ -17,7 +17,7 @@ not just the last tool result.
 
 Splitting the roles gives you:
 
-- A planner you can run on `gemini-3.1-pro` while the researchers
+- A planner you can run on `gemini-3.1-pro-preview` while the researchers
   run on Flash. Plans benefit from reasoning; bulk searching does
   not.
 - Independent retry and refinement. The LoopAgent can discard a bad
@@ -41,7 +41,7 @@ class Plan(BaseModel):
 
 
 planner = LlmAgent(
-    name="planner", model="gemini-3.1-pro",
+    name="planner", model="gemini-3.1-pro-preview",
     instruction=(
         "You are a research planner. Break the user's question into "
         "3-6 concrete retrieval steps. Each step should be directly "
@@ -51,7 +51,7 @@ planner = LlmAgent(
 
 
 web = LlmAgent(
-    name="web_researcher", model="gemini-3.1-flash",
+    name="web_researcher", model="gemini-3-flash-preview",
     instruction=(
         "Execute every step in state['plan'].steps using google_search. "
         "Write 3-5 bullets per step to state['web_notes']."),
@@ -59,7 +59,7 @@ web = LlmAgent(
 )
 
 mem = LlmAgent(
-    name="memory_researcher", model="gemini-3.1-flash",
+    name="memory_researcher", model="gemini-3-flash-preview",
     instruction=(
         "Search long-term memory for any prior findings on the same topic. "
         "Write to state['mem_notes']. Skip if none found."),
@@ -76,7 +76,7 @@ def stop_if_enough(cc: CallbackContext):
 
 
 synthesiser = LlmAgent(
-    name="synthesiser", model="gemini-3.1-pro",
+    name="synthesiser", model="gemini-3.1-pro-preview",
     instruction=(
         "Given state['plan'], state['web_notes'], state['mem_notes'], "
         "rate coverage 0-1 in state['coverage_score']. If below 0.8, "
@@ -95,7 +95,7 @@ loop = LoopAgent(
 
 
 writer = LlmAgent(
-    name="writer", model="gemini-3.1-pro",
+    name="writer", model="gemini-3.1-pro-preview",
     instruction=(
         "Write a 400-word report answering the user question using "
         "state['web_notes'] and state['mem_notes']. Cite inline as [n]. "

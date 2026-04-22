@@ -11,7 +11,7 @@ except Exception:  # Missing deps; keep file loadable
 
 root_agent = LlmAgent(
     name="search",
-    model="gemini-3.1-flash",
+    model="gemini-3-flash-preview",
     description="Web search via a CrewAI tool.",
     instruction="Call the Serper tool to search the web. Quote 3 results.",
     tools=[_crew_tool] if _crew_tool else [],

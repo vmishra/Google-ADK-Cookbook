@@ -68,7 +68,7 @@ from google.genai import types
 
 root = LlmAgent(
     name="planner",
-    model="gemini-3.1-pro",
+    model="gemini-3.1-pro-preview",
     description="Plans a multi-step task and delegates to workers.",
     instruction="Break the task into 3 steps. Emit steps as JSON.",
     tools=[...],
@@ -103,7 +103,7 @@ def instruction_provider(ctx):
     return f"You are a support agent. Tier: {tier}."
 
 root = LlmAgent(
-    name="support", model="gemini-3.1-flash",
+    name="support", model="gemini-3-flash-preview",
     instruction=instruction_provider,
     tools=[...],
 )
@@ -121,12 +121,12 @@ class PlanSchema(BaseModel):
     risk: Literal["low", "medium", "high"]
 
 planner = LlmAgent(
-    name="planner", model="gemini-3.1-pro",
+    name="planner", model="gemini-3.1-pro-preview",
     instruction="...",
     output_schema=PlanSchema, output_key="plan",
 )
 executor = LlmAgent(
-    name="executor", model="gemini-3.1-flash",
+    name="executor", model="gemini-3-flash-preview",
     instruction="Execute the plan in state['plan'].",
 )
 SequentialAgent(name="pipeline", sub_agents=[planner, executor])
@@ -217,7 +217,7 @@ from google.adk.agents.remote_a2a_agent import RemoteA2aAgent
 
 sre = RemoteA2aAgent(name="sre",
     agent_card="https://sre.internal/a2a/agent-card")
-root = LlmAgent(name="root", model="gemini-3.1-flash", sub_agents=[sre])
+root = LlmAgent(name="root", model="gemini-3-flash-preview", sub_agents=[sre])
 ```
 
 ---

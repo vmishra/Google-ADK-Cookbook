@@ -31,15 +31,15 @@ def sql_lookup(query: str) -> dict:
     ]}
 
 
-web = LlmAgent(name="web", model="gemini-3.1-flash",
+web = LlmAgent(name="web", model="gemini-3-flash-preview",
                instruction="Call web_lookup once with the question. Write bullets to state['web'].",
                tools=[web_lookup], output_key="web")
 
-kb = LlmAgent(name="kb", model="gemini-3.1-flash",
+kb = LlmAgent(name="kb", model="gemini-3-flash-preview",
               instruction="Call kb_lookup once with the question. Write bullets to state['kb'].",
               tools=[kb_lookup], output_key="kb")
 
-sql = LlmAgent(name="sql", model="gemini-3.1-flash",
+sql = LlmAgent(name="sql", model="gemini-3-flash-preview",
                instruction="Call sql_lookup once with the question. Write bullets to state['sql'].",
                tools=[sql_lookup], output_key="sql")
 
@@ -47,7 +47,7 @@ fan_out = ParallelAgent(name="fan_out", sub_agents=[web, kb, sql])
 
 reviewer = LlmAgent(
     name="reviewer",
-    model="gemini-3.1-pro",
+    model="gemini-3.1-pro-preview",
     instruction=(
         "You have state['web'], state['kb'], state['sql']. "
         "Reconcile into a short answer citing each source: [web], [kb], [sql]."),

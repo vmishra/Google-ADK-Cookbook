@@ -88,7 +88,7 @@ function ParallelDiagram({ level }: { level: "beginner" | "intermediate" | "adva
       ))}
 
       <Node x={852} y={290} w={176} h={84} kind="agent" tone="accent" active
-            title="reviewer" subtitle="gemini-3.1-pro"
+            title="reviewer" subtitle="gemini-3.1-pro-preview"
             kicker="REDUCE" delay={1.9} />
 
       {level !== "beginner" && (

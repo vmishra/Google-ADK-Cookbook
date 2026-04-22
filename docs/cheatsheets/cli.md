@@ -7,7 +7,7 @@ adk --version                       # show version
 adk run agents/support              # interactive REPL
 adk run agents/support --replay path/to/session.json
 adk run agents/support --resume path/to/session.json
-adk run agents/support --model gemini-3.1-pro
+adk run agents/support --model gemini-3.1-pro-preview
 
 # Dev UI
 adk web                             # http://127.0.0.1:8000

@@ -19,7 +19,7 @@ from langchain.tools import YouTubeSearchTool
 yt = LangchainTool(tool=YouTubeSearchTool())
 
 agent = LlmAgent(
-    model="gemini-3.1-flash",
+    model="gemini-3-flash-preview",
     tools=[yt],
     instruction="Find relevant YouTube videos.")
 ```

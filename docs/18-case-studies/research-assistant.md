@@ -12,14 +12,14 @@ cited report that reliably cites what it actually used.
 
 ```mermaid
 flowchart LR
-  Q[question] --> P[planner<br/>gemini-3.1-pro]
+  Q[question] --> P[planner<br/>gemini-3.1-pro-preview]
   P --> FO[fan_out<br/>ParallelAgent]
   FO --> W[web<br/>google_search]
   FO --> R[rag<br/>VertexAiRagRetrieval]
   FO --> M[memory<br/>load_memory_tool]
-  W & R & M --> S[synthesiser<br/>gemini-3.1-pro]
+  W & R & M --> S[synthesiser<br/>gemini-3.1-pro-preview]
   S -->|coverage<0.8| P
-  S -->|coverage>=0.8| WR[writer<br/>gemini-3.1-pro]
+  S -->|coverage>=0.8| WR[writer<br/>gemini-3.1-pro-preview]
   WR --> Out[dossier + citations]
   style P fill:#c9a45a,color:#0f0f12
   style S fill:#c9a45a,color:#0f0f12

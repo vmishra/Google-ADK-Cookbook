@@ -79,7 +79,7 @@ function OpeningDiagram({ level }: { level: "beginner" | "intermediate" | "advan
     <Canvas>
       {/* Center — the agent */}
       <Node x={500} y={320} kind="agent" tone="accent" active
-            title="LlmAgent" subtitle="gemini-3.1-flash" kicker="CORE" />
+            title="LlmAgent" subtitle="gemini-3-flash-preview" kicker="CORE" />
 
       {/* Four petals */}
       <Node x={500} y={130} kind="user" title="User"        subtitle="text · voice · vision" />

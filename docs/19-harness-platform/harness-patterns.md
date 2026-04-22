@@ -140,7 +140,7 @@ across agents a tenant has registered.
 ```python
 root = LlmAgent(
     name="meta",
-    model="gemini-3.1-pro",
+    model="gemini-3.1-pro-preview",
     instruction="Route the user's request to the best agent for the job.",
     sub_agents=[RemoteA2aAgent(name=a.id, agent_card=a.card_url)
                 for a in registry.list_for(tenant)],

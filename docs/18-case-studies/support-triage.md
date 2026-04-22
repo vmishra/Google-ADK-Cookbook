@@ -12,7 +12,7 @@ sessions for returning customers.
 
 ```mermaid
 flowchart TB
-  U[User] --> C[Coordinator<br/>gemini-3.1-flash]
+  U[User] --> C[Coordinator<br/>gemini-3-flash-preview]
   C -->|billing questions| B[billing specialist]
   C -->|tech issues| T[tech specialist]
   C -->|returns| R[returns specialist]
@@ -71,21 +71,21 @@ flowchart TB
 from google.adk.agents import LlmAgent
 from google.adk.tools.load_memory_tool import load_memory_tool
 
-billing = LlmAgent(name="billing", model="gemini-3.1-flash",
+billing = LlmAgent(name="billing", model="gemini-3-flash-preview",
     description="Invoices, charges, refunds.",
     instruction="...", tools=[...])
 
-tech = LlmAgent(name="tech", model="gemini-3.1-flash",
+tech = LlmAgent(name="tech", model="gemini-3-flash-preview",
     description="Technical issues with the product.",
     instruction="If the problem is hardware or config, escalate to tech_hard.",
     tools=[...], sub_agents=[tech_hard])
 
-returns = LlmAgent(name="returns", model="gemini-3.1-flash",
+returns = LlmAgent(name="returns", model="gemini-3-flash-preview",
     description="Return and RMA requests.",
     instruction="...", tools=[...])
 
 root_agent = LlmAgent(
-    name="front_desk", model="gemini-3.1-flash",
+    name="front_desk", model="gemini-3-flash-preview",
     instruction="Classify and transfer. Do not answer specialised questions.",
     sub_agents=[billing, tech, returns],
     tools=[load_memory_tool],

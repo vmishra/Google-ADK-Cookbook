@@ -34,14 +34,14 @@ from google.adk.tools.agent_tool import AgentTool
 
 summariser = LlmAgent(
     name="summariser",
-    model="gemini-3.1-flash",
+    model="gemini-3-flash-preview",
     description="Summarises a passage into one paragraph.",
     instruction="Summarise the input passage into one paragraph of <=80 words.",
 )
 
 fact_checker = LlmAgent(
     name="fact_checker",
-    model="gemini-3.1-pro",
+    model="gemini-3.1-pro-preview",
     description="Verifies factual claims against web sources.",
     instruction="Verify each claim. Return a list of claim/verdict/source tuples.",
     tools=[google_search],
@@ -50,7 +50,7 @@ fact_checker = LlmAgent(
 
 root_agent = LlmAgent(
     name="editor",
-    model="gemini-3.1-pro",
+    model="gemini-3.1-pro-preview",
     instruction=(
         "You are an editor. Given a draft, first call summariser. "
         "Then call fact_checker on the summary. Return a clean final."),

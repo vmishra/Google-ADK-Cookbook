@@ -108,7 +108,7 @@ from google.genai import types
 
 root = LlmAgent(
     name="hello",
-    model="gemini-3.1-flash",
+    model="gemini-3-flash-preview",
     instruction="Reply in one sentence.",
 )
 
@@ -147,7 +147,7 @@ flowchart TD
   F1[ModuleNotFoundError: google.adk] --> R1[pip install google-adk in active venv]
   F2[DefaultCredentialsError] --> R2[gcloud auth application-default login]
   F3[PermissionDenied on generativeai] --> R3[Enable Vertex AI API on the project]
-  F4[404 model gemini-3.1-flash] --> R4[Check GOOGLE_CLOUD_LOCATION; some models are region-scoped]
+  F4[404 model gemini-3-flash-preview] --> R4[Check GOOGLE_CLOUD_LOCATION; some models are region-scoped]
   F5[Empty response] --> R5[Check .env is loaded, model is accessible, and generate_content_config permits content]
 ```
 

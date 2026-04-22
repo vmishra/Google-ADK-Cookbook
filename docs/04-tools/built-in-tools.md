@@ -19,7 +19,7 @@ from google.adk.tools import google_search
 
 root_agent = LlmAgent(
     name="researcher",
-    model="gemini-3.1-flash",
+    model="gemini-3-flash-preview",
     instruction="Answer factually. Use google_search when you are not sure.",
     tools=[google_search],
 )
@@ -46,7 +46,7 @@ docs_tool = VertexAiRagRetrieval(
     rag_resources=[rag.RagResource(rag_corpus=os.environ["RAG_CORPUS"])],
 )
 
-root_agent = LlmAgent(model="gemini-3.1-flash", tools=[docs_tool])
+root_agent = LlmAgent(model="gemini-3-flash-preview", tools=[docs_tool])
 ```
 
 ## `load_memory_tool` and `preload_memory_tool`
@@ -59,7 +59,7 @@ Read long-term memory on demand or eagerly. See
 from google.adk.tools.load_memory_tool import load_memory_tool
 from google.adk.tools.preload_memory_tool import preload_memory_tool
 
-agent = LlmAgent(model="gemini-3.1-flash",
+agent = LlmAgent(model="gemini-3-flash-preview",
                  tools=[load_memory_tool, preload_memory_tool])
 ```
 
@@ -75,7 +75,7 @@ from google.adk.code_executors.agent_engine_sandbox_code_executor import (
 
 root_agent = LlmAgent(
     name="data_scientist",
-    model="gemini-3.1-pro",
+    model="gemini-3.1-pro-preview",
     instruction="Answer with pandas code where appropriate.",
     code_executor=AgentEngineSandboxCodeExecutor(
         project="my-project", location="us-central1"),
@@ -103,7 +103,7 @@ from google.adk.tools.environment import EnvironmentToolset
 env = LocalEnvironment(workdir="./workspace")
 root_agent = LlmAgent(
     name="scaffolder",
-    model="gemini-3.1-pro",
+    model="gemini-3.1-pro-preview",
     tools=[EnvironmentToolset(env)],
 )
 ```
