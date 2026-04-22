@@ -37,6 +37,8 @@ from __future__ import annotations
 import os
 
 from google.adk.agents import LlmAgent
+from google.adk.planners import BuiltInPlanner
+from google.genai import types as genai_types
 
 from .memory import (
     clear_profile,
@@ -119,6 +121,14 @@ root_agent = LlmAgent(
         "delegates to specialist sub-agents."
     ),
     instruction=ROOT_INSTRUCTION,
+    # LOW thinking — the root's job is decision-making: which tools
+    # fill the profile, which skill to unlock, which coordinator to
+    # hand off to. Worth a small chain-of-thought, not a large one.
+    planner=BuiltInPlanner(
+        thinking_config=genai_types.ThinkingConfig(
+            thinking_level=genai_types.ThinkingLevel.LOW,
+        ),
+    ),
     tools=[
         # profile memory
         remember_skin,

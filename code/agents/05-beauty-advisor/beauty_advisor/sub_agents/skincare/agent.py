@@ -19,10 +19,19 @@ from __future__ import annotations
 import os
 
 from google.adk.agents import LlmAgent
+from google.adk.planners import BuiltInPlanner
 from google.adk.tools.agent_tool import AgentTool
+from google.genai import types as genai_types
 
 from ...memory import get_profile
 from ...tools import search_skincare
+
+
+_LOW_THINKING = BuiltInPlanner(
+    thinking_config=genai_types.ThinkingConfig(
+        thinking_level=genai_types.ThinkingLevel.LOW,
+    ),
+)
 
 
 WORKER_MODEL = os.environ.get("BEAUTY_WORKER_MODEL", "gemini-3.1-flash-lite-preview")
@@ -91,6 +100,7 @@ skincare_coordinator = LlmAgent(
         "Coordinates a full skincare routine. Calls the three skincare "
         "specialists and composes AM and PM routines."
     ),
+    planner=_LOW_THINKING,
     instruction=(
         "When the customer asks for a skincare routine, first read the "
         "profile with `get_profile`. If `skin.type` or the primary "

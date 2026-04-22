@@ -4,10 +4,19 @@ from __future__ import annotations
 import os
 
 from google.adk.agents import LlmAgent
+from google.adk.planners import BuiltInPlanner
 from google.adk.tools.agent_tool import AgentTool
+from google.genai import types as genai_types
 
 from ...memory import get_profile
 from ...tools import search_haircare
+
+
+_LOW_THINKING = BuiltInPlanner(
+    thinking_config=genai_types.ThinkingConfig(
+        thinking_level=genai_types.ThinkingLevel.LOW,
+    ),
+)
 
 
 WORKER_MODEL = os.environ.get("BEAUTY_WORKER_MODEL", "gemini-3.1-flash-lite-preview")
@@ -65,6 +74,7 @@ haircare_coordinator = LlmAgent(
         "Coordinates a haircare routine. Delegates to wash, treatment, "
         "and styling specialists."
     ),
+    planner=_LOW_THINKING,
     instruction=(
         "Call `get_profile`. If hair type or texture is unknown, ask one "
         "question. Otherwise call the three specialists "

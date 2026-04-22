@@ -4,10 +4,19 @@ from __future__ import annotations
 import os
 
 from google.adk.agents import LlmAgent
+from google.adk.planners import BuiltInPlanner
 from google.adk.tools.agent_tool import AgentTool
+from google.genai import types as genai_types
 
 from ...memory import get_profile
 from ...tools import search_makeup
+
+
+_LOW_THINKING = BuiltInPlanner(
+    thinking_config=genai_types.ThinkingConfig(
+        thinking_level=genai_types.ThinkingLevel.LOW,
+    ),
+)
 
 
 WORKER_MODEL = os.environ.get("BEAUTY_WORKER_MODEL", "gemini-3.1-flash-lite-preview")
@@ -66,6 +75,7 @@ makeup_coordinator = LlmAgent(
         "Coordinates a base-makeup recommendation. Delegates to primer, "
         "foundation, and setting specialists."
     ),
+    planner=_LOW_THINKING,
     instruction=(
         "For base makeup, call `get_profile` first. If undertone is "
         "unknown, ask one targeted question to establish it rather "
