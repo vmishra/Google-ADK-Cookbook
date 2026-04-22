@@ -17,7 +17,6 @@ interface Props {
 
 export function AgentPage({ id }: Props) {
   const agent = findAgent(id);
-  const [lastTurn, setLastTurn] = useState<any>(null);
   const [active, setActive] = useState(false);
 
   if (!agent) {
@@ -53,13 +52,12 @@ export function AgentPage({ id }: Props) {
         </aside>
         <main className="flex-1 flex flex-col min-w-0">
           <div className="border-b border-[var(--border)] px-5 py-3 bg-[var(--surface)]">
-            <MetricsRibbon baseUrl={agent.baseUrl} lastTurn={lastTurn} />
+            <MetricsRibbon baseUrl={agent.baseUrl} />
           </div>
           <div className="flex-1 min-h-0">
             {agent.modality === "voice" ? (
               <VoicePanel
                 baseUrl={agent.baseUrl}
-                onTurn={setLastTurn}
                 onActive={setActive}
               />
             ) : agent.modality === "computer-use" && agent.dashboardUrl ? (
@@ -67,14 +65,12 @@ export function AgentPage({ id }: Props) {
                 baseUrl={agent.baseUrl}
                 prompts={agent.prompts}
                 dashboardUrl={agent.dashboardUrl}
-                onTurn={setLastTurn}
                 onActive={setActive}
               />
             ) : (
               <ChatPanel
                 baseUrl={agent.baseUrl}
                 prompts={agent.prompts}
-                onTurn={setLastTurn}
                 onActive={setActive}
                 showAuthor={agent.modality === "deep-research"}
               />

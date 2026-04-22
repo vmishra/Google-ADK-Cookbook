@@ -1,27 +1,12 @@
 import { useEffect, useState } from "react";
 
-interface TurnMetrics {
-  model: string;
-  ttft_ms?: number | null;
-  total_ms?: number | null;
-  in_flight?: boolean;
-  tokens_per_second?: number | null;
-  input_tokens?: number;
-  cached_tokens?: number;
-  output_tokens?: number;
-  thinking_tokens?: number;
-  tool_use_prompt_tokens?: number;
-  total_tokens?: number;
-  cache_hit_ratio?: number;
-  tool_calls?: number;
-  model_calls?: number;
-  partial_events?: number;
-  interrupted?: boolean;
-  finish_reason?: string | null;
-  cost_inr?: number;
-  cost_usd?: number;
-  error?: string | null;
-}
+/**
+ * Session-level aggregate ribbon. Polls /metrics every 3.5 s and
+ * renders the rolling p50/p95 plus totals for the last 50 turns.
+ *
+ * Per-turn telemetry lives inline under each model bubble via
+ * <TurnTelemetry /> — by design, this ribbon never shows 'this turn'.
+ */
 
 interface Summary {
   count: number;
@@ -45,10 +30,9 @@ interface Summary {
 
 interface Props {
   baseUrl: string;
-  lastTurn?: TurnMetrics | null;
 }
 
-export function MetricsRibbon({ baseUrl, lastTurn }: Props) {
+export function MetricsRibbon({ baseUrl }: Props) {
   const [summary, setSummary] = useState<Summary | null>(null);
 
   useEffect(() => {
@@ -69,78 +53,56 @@ export function MetricsRibbon({ baseUrl, lastTurn }: Props) {
       alive = false;
       clearInterval(interval);
     };
-  }, [baseUrl, lastTurn]);
+  }, [baseUrl]);
 
-  const scope = lastTurn
-    ? (lastTurn.in_flight ? "live" : "last turn")
-    : "p50 · last 50";
-  const totalScope = lastTurn
-    ? (lastTurn.in_flight ? "live" : "last turn")
-    : "total";
+  const count = summary?.count ?? 0;
+  const scope = count > 0 ? `${count} turn${count === 1 ? "" : "s"}` : "session";
 
   const primary = [
     {
-      label: "ttft",
-      value: fmtMs(lastTurn?.ttft_ms ?? summary?.ttft_p50_ms ?? null),
-      hint: scope,
+      label: "ttft · p50",
+      value: fmtMs(summary?.ttft_p50_ms),
+      hint: fmtMs(summary?.ttft_p95_ms, "p95"),
     },
     {
-      label: "latency",
-      value: fmtMs(lastTurn?.total_ms ?? summary?.latency_p50_ms ?? null),
-      hint: scope,
+      label: "latency · p50",
+      value: fmtMs(summary?.latency_p50_ms),
+      hint: fmtMs(summary?.latency_p95_ms, "p95"),
     },
     {
       label: "tokens · in",
-      value: fmtInt(lastTurn?.input_tokens ?? summary?.total_input_tokens),
-      hint: totalScope,
+      value: fmtInt(summary?.total_input_tokens),
+      hint: scope,
     },
     {
       label: "tokens · out",
-      value: fmtInt(lastTurn?.output_tokens ?? summary?.total_output_tokens),
-      hint: totalScope,
+      value: fmtInt(summary?.total_output_tokens),
+      hint: scope,
     },
     {
       label: "tools",
-      value: fmtInt(lastTurn?.tool_calls ?? summary?.total_tool_calls),
-      hint: totalScope,
+      value: fmtInt(summary?.total_tool_calls),
+      hint: scope,
     },
     {
       label: "cost",
-      value: fmtInr(lastTurn?.cost_inr ?? summary?.total_cost_inr),
-      hint: totalScope,
+      value: fmtInr(summary?.total_cost_inr),
+      hint: scope,
     },
   ];
 
   const secondary = [
+    { label: "tok/s · p50", value: fmtRate(summary?.tokens_per_second_p50) },
+    { label: "cache", value: fmtRatio(summary?.cache_hit_ratio) },
+    { label: "thinking", value: fmtInt(summary?.total_thinking_tokens) },
+    { label: "model calls", value: fmtInt(summary?.total_model_calls) },
+    { label: "total tok", value: fmtInt(summary?.total_tokens) },
     {
-      label: "tok/s",
-      value: fmtRate(
-        lastTurn?.tokens_per_second ?? summary?.tokens_per_second_p50 ?? null,
-      ),
-    },
-    {
-      label: "cache",
-      value: fmtRatio(
-        lastTurn?.cache_hit_ratio ?? summary?.cache_hit_ratio ?? null,
-      ),
-    },
-    {
-      label: "thinking",
-      value: fmtInt(
-        lastTurn?.thinking_tokens ?? summary?.total_thinking_tokens,
-      ),
-    },
-    {
-      label: "model calls",
-      value: fmtInt(lastTurn?.model_calls ?? summary?.total_model_calls),
-    },
-    {
-      label: "total tok",
-      value: fmtInt(lastTurn?.total_tokens ?? summary?.total_tokens),
-    },
-    {
-      label: "finish",
-      value: fmtFinish(lastTurn?.finish_reason ?? null, summary?.error_count),
+      label: "errors",
+      value:
+        summary?.error_count && summary.error_count > 0
+          ? String(summary.error_count)
+          : "0",
     },
   ];
 
@@ -183,10 +145,10 @@ export function MetricsRibbon({ baseUrl, lastTurn }: Props) {
 
 /* ---------- formatters ---------- */
 
-function fmtMs(v: number | null | undefined): string {
+function fmtMs(v: number | null | undefined, hint?: string): string {
   if (v == null) return "–";
-  if (v < 1000) return `${Math.round(v)} ms`;
-  return `${(v / 1000).toFixed(2)} s`;
+  const s = v < 1000 ? `${Math.round(v)} ms` : `${(v / 1000).toFixed(2)} s`;
+  return hint ? `${hint} ${s}` : s;
 }
 
 function fmtInt(v: number | null | undefined): string {
@@ -209,11 +171,4 @@ function fmtRate(v: number | null | undefined): string {
 function fmtRatio(v: number | null | undefined): string {
   if (v == null || v === 0) return "0%";
   return `${Math.round(v * 100)}%`;
-}
-
-function fmtFinish(last: string | null | undefined, errorCount?: number): string {
-  if (last && last !== "STOP") return last.toLowerCase();
-  if (errorCount && errorCount > 0) return `${errorCount} err`;
-  if (last === "STOP") return "stop";
-  return "–";
 }
