@@ -14,18 +14,54 @@ interface Props {
   showAuthor?: boolean;
 }
 
+export interface ToolExchange {
+  name: string;
+  args: any;
+  result?: any;
+  id: string;
+}
+
+export interface TurnMetrics {
+  model?: string;
+  ttft_ms?: number | null;
+  total_ms?: number | null;
+  in_flight?: boolean;
+  tokens_per_second?: number | null;
+  input_tokens?: number;
+  cached_tokens?: number;
+  output_tokens?: number;
+  thinking_tokens?: number;
+  tool_use_prompt_tokens?: number;
+  total_tokens?: number;
+  cache_hit_ratio?: number;
+  modalities?: {
+    input?: Record<string, number>;
+    output?: Record<string, number>;
+    cached?: Record<string, number>;
+  };
+  tool_calls?: number;
+  model_calls?: number;
+  partial_events?: number;
+  interrupted?: boolean;
+  finish_reason?: string | null;
+  cost_usd?: number;
+  cost_inr?: number;
+  error?: string | null;
+}
+
 type Turn =
   | { kind: "user"; text: string }
   | {
       kind: "model";
       text: string;
-      toolCalls: { name: string; args: any }[];
+      toolCalls: ToolExchange[];
       author?: string;
       complete: boolean;
+      metrics?: TurnMetrics;
     }
   | { kind: "error"; text: string };
 
-export function ChatPanel({ baseUrl, prompts, onTurn, onActive, showAuthor }: Props) {
+export function ChatPanel({ baseUrl, prompts, onActive, showAuthor }: Props) {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [reachable, setReachable] = useState<boolean | null>(null);
   const [turns, setTurns] = useState<Turn[]>([]);
@@ -103,9 +139,30 @@ export function ChatPanel({ baseUrl, prompts, onTurn, onActive, showAuthor }: Pr
             if (last?.kind === "model") {
               copy[copy.length - 1] = {
                 ...last,
-                toolCalls: [...last.toolCalls, { name: evt.name, args: evt.args }],
+                toolCalls: [
+                  ...last.toolCalls,
+                  { name: evt.name, args: evt.args, id: crypto.randomUUID() },
+                ],
                 author: evt.author ?? last.author,
               };
+            }
+            return copy;
+          });
+        } else if (evt.kind === "tool_result") {
+          setTurns((arr) => {
+            const copy = [...arr];
+            const last = copy[copy.length - 1];
+            if (last?.kind === "model") {
+              // Fill the result into the most-recent unresolved call of
+              // the same name — ADK fires call → result in order.
+              const calls = [...last.toolCalls];
+              for (let i = calls.length - 1; i >= 0; i--) {
+                if (calls[i]!.name === evt.name && calls[i]!.result === undefined) {
+                  calls[i] = { ...calls[i]!, result: evt.data };
+                  break;
+                }
+              }
+              copy[copy.length - 1] = { ...last, toolCalls: calls };
             }
             return copy;
           });
@@ -119,17 +176,29 @@ export function ChatPanel({ baseUrl, prompts, onTurn, onActive, showAuthor }: Pr
             return copy;
           });
         } else if (evt.kind === "metrics_tick") {
-          if (evt.metrics) onTurn?.(evt.metrics);
+          if (evt.metrics) {
+            setTurns((arr) => {
+              const copy = [...arr];
+              const last = copy[copy.length - 1];
+              if (last?.kind === "model") {
+                copy[copy.length - 1] = { ...last, metrics: evt.metrics };
+              }
+              return copy;
+            });
+          }
         } else if (evt.kind === "turn_complete") {
           setTurns((arr) => {
             const copy = [...arr];
             const last = copy[copy.length - 1];
             if (last?.kind === "model") {
-              copy[copy.length - 1] = { ...last, complete: true };
+              copy[copy.length - 1] = {
+                ...last,
+                complete: true,
+                metrics: evt.metrics ?? last.metrics,
+              };
             }
             return copy;
           });
-          if (evt.metrics) onTurn?.(evt.metrics);
         } else if (evt.kind === "error") {
           setTurns((arr) => [
             ...arr,
