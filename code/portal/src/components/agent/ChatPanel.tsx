@@ -118,6 +118,8 @@ export function ChatPanel({ baseUrl, prompts, onTurn, onActive, showAuthor }: Pr
             }
             return copy;
           });
+        } else if (evt.kind === "metrics_tick") {
+          if (evt.metrics) onTurn?.(evt.metrics);
         } else if (evt.kind === "turn_complete") {
           setTurns((arr) => {
             const copy = [...arr];

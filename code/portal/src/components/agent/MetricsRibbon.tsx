@@ -4,6 +4,7 @@ interface TurnMetrics {
   model: string;
   ttft_ms?: number | null;
   total_ms?: number | null;
+  in_flight?: boolean;
   tokens_per_second?: number | null;
   input_tokens?: number;
   cached_tokens?: number;
@@ -70,7 +71,12 @@ export function MetricsRibbon({ baseUrl, lastTurn }: Props) {
     };
   }, [baseUrl, lastTurn]);
 
-  const scope = lastTurn ? "this turn" : "p50 · last 50";
+  const scope = lastTurn
+    ? (lastTurn.in_flight ? "live" : "last turn")
+    : "p50 · last 50";
+  const totalScope = lastTurn
+    ? (lastTurn.in_flight ? "live" : "last turn")
+    : "total";
 
   const primary = [
     {
@@ -86,22 +92,22 @@ export function MetricsRibbon({ baseUrl, lastTurn }: Props) {
     {
       label: "tokens · in",
       value: fmtInt(lastTurn?.input_tokens ?? summary?.total_input_tokens),
-      hint: lastTurn ? "this turn" : "total",
+      hint: totalScope,
     },
     {
       label: "tokens · out",
       value: fmtInt(lastTurn?.output_tokens ?? summary?.total_output_tokens),
-      hint: lastTurn ? "this turn" : "total",
+      hint: totalScope,
     },
     {
       label: "tools",
       value: fmtInt(lastTurn?.tool_calls ?? summary?.total_tool_calls),
-      hint: lastTurn ? "this turn" : "total",
+      hint: totalScope,
     },
     {
       label: "cost",
       value: fmtInr(lastTurn?.cost_inr ?? summary?.total_cost_inr),
-      hint: lastTurn ? "this turn" : "total",
+      hint: totalScope,
     },
   ];
 

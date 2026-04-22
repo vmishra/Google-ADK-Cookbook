@@ -125,6 +125,11 @@ async def _stream(session_id: str, message: str) -> AsyncIterator[str]:
                         "name": part.function_response.name,
                         "data": part.function_response.response,
                     })
+            # After every event, emit a live metrics tick so the portal
+            # ribbon updates in real time (tokens ticking up, latency
+            # climbing, etc.). The final snapshot still rides on
+            # turn_complete.
+            yield _sse({"kind": "metrics_tick", "metrics": turn.as_dict()})
             if event.is_final_response():
                 turn.finish()
                 metrics.record(turn)

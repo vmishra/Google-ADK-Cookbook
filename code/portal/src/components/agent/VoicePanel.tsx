@@ -79,6 +79,8 @@ export function VoicePanel({ baseUrl, onTurn, onActive }: Props) {
           ...arr,
           { name: msg.name, args: msg.args, id: crypto.randomUUID() },
         ]);
+      } else if (msg.kind === "metrics_tick") {
+        if (msg.metrics) onTurn?.(msg.metrics);
       } else if (msg.kind === "turn_complete") {
         onActive?.(false);
         if (msg.metrics) onTurn?.(msg.metrics);

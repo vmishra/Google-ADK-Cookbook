@@ -173,6 +173,11 @@ async def _forward_model_to_browser(
                         "name": part.function_response.name,
                         "data": _jsonable(part.function_response.response),
                     })
+            # Live metric tick every event so the browser ribbon ticks.
+            await ws.send_json({
+                "kind": "metrics_tick",
+                "metrics": turn.as_dict(),
+            })
             if getattr(event, "turn_complete", False):
                 turn.finish()
                 metrics.record(turn)

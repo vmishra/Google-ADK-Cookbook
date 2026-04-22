@@ -122,6 +122,7 @@ async def _stream(session_id: str, message: str) -> AsyncIterator[str]:
                         "screenshot": screenshot_b64,
                         "data": _compact(response),
                     })
+            yield _sse({"kind": "metrics_tick", "metrics": turn.as_dict()})
             if event.is_final_response():
                 turn.finish()
                 metrics.record(turn)

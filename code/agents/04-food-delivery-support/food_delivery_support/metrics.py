@@ -192,6 +192,10 @@ class TurnMetrics:
         self.error = error
 
     def as_dict(self) -> dict:
+        # Live snapshot — if the turn is still running, clock against
+        # now so total_ms and tokens_per_second tick up in real time.
+        end = self.finished_at if self.finished_at is not None else time.monotonic()
+
         def ms(a: float | None, b: float | None) -> float | None:
             if a is None or b is None:
                 return None
@@ -206,10 +210,10 @@ class TurnMetrics:
             + (self.thinking_tokens / 1_000_000) * out_price
         )
 
-        # tokens/sec over the streaming window (first_token → finished).
+        # tokens/sec over the streaming window (first_token → end).
         tps: float | None = None
-        if self.first_token_at and self.finished_at:
-            window = self.finished_at - self.first_token_at
+        if self.first_token_at:
+            window = end - self.first_token_at
             if window > 0 and self.output_tokens > 0:
                 tps = round(self.output_tokens / window, 1)
 
@@ -220,9 +224,10 @@ class TurnMetrics:
 
         return {
             "model": self.model,
-            # latency
+            # latency — total_ms ticks up live while the turn is in flight.
             "ttft_ms": ms(self.started_at, self.first_token_at),
-            "total_ms": ms(self.started_at, self.finished_at),
+            "total_ms": ms(self.started_at, end),
+            "in_flight": self.finished_at is None,
             "tokens_per_second": tps,
             # tokens
             "input_tokens": self.input_tokens,
