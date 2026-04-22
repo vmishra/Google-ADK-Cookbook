@@ -1,23 +1,37 @@
-"""Light-weight per-turn telemetry for the agent's FastAPI server.
+"""Per-turn telemetry for the agent's FastAPI server.
 
 We record one `TurnMetrics` per user message and keep the last N in a
-ring buffer. The `/metrics` endpoint on the server returns the current
-summary + raw turns as JSON, which the portal renders live.
+ring buffer. `/metrics` returns `{summary, turns}` — the portal renders
+this as the live ribbon at the top of each agent page and shows the
+per-turn snapshot inline on `turn_complete`.
 
-What we track per turn:
+Per-turn fields captured:
 
-- `ttft_ms`        — time from receiving the user message to the first
-                     text or audio token the model emits.
-- `total_ms`       — time from receive to turn_complete.
-- `input_tokens`   — prompt tokens (max across the turn, since ADK
-                     events report growing totals as sub-agents run).
-- `output_tokens`  — candidate tokens (sum across the turn).
-- `tool_calls`     — count of function calls the model made.
-- `cost_inr`       — best-effort estimate from the token counts.
-- `model`          — which model answered. Useful when an agent is a
-                     pipeline with multiple tiers.
+  Latency decomposition
+    ttft_ms               receive → first model token (text or audio)
+    total_ms              receive → turn_complete
+    tokens_per_second     output rate between first_token and finish
 
-These are *estimates* — published public prices move. Treat them as a
+  Token accounting (from google.genai event.usage_metadata)
+    input_tokens          prompt_token_count — max over the turn
+    cached_tokens         cached_content_token_count — cached prompt
+    output_tokens         candidates_token_count — sum over the turn
+    thinking_tokens       thoughts_token_count — Gemini 3 reasoning
+    total_tokens          input + output + thinking (for quick reads)
+    cache_hit_ratio       cached / input, 0.0 when input is 0
+
+  Tool + orchestration
+    tool_calls            function calls the model emitted
+    model_calls           distinct events carrying usage_metadata — for
+                          sub-agent pipelines this reveals how many
+                          model calls the turn actually cost
+
+  Cost (estimate, INR + USD)
+    Non-cached prompt input billed at the model's input price;
+    cached prompt input billed at a 25% discount; output and
+    thinking tokens both billed at the output price.
+
+These are *estimates* — published public prices move. Treat as a
 ballpark for comparing design choices, not a billing statement.
 """
 from __future__ import annotations
@@ -41,6 +55,9 @@ _PRICES: dict[str, tuple[float, float]] = {
 }
 _USD_TO_INR = 84.0
 
+# Google bills cached prompt tokens at roughly 25% of the input rate.
+_CACHE_DISCOUNT = 0.25
+
 
 def _price_of(model: str) -> tuple[float, float]:
     # Longest prefix match so `gemini-3-flash-preview-*` hits the right tier.
@@ -54,7 +71,8 @@ def _price_of(model: str) -> tuple[float, float]:
 class TurnMetrics:
     __slots__ = (
         "model", "started_at", "first_token_at", "finished_at",
-        "input_tokens", "output_tokens", "tool_calls", "error",
+        "input_tokens", "cached_tokens", "output_tokens", "thinking_tokens",
+        "tool_calls", "model_calls", "error",
     )
 
     def __init__(self, model: str):
@@ -63,8 +81,11 @@ class TurnMetrics:
         self.first_token_at: float | None = None
         self.finished_at: float | None = None
         self.input_tokens: int = 0
+        self.cached_tokens: int = 0
         self.output_tokens: int = 0
+        self.thinking_tokens: int = 0
         self.tool_calls: int = 0
+        self.model_calls: int = 0
         self.error: str | None = None
 
     def mark_first_token(self) -> None:
@@ -74,25 +95,34 @@ class TurnMetrics:
     def record_usage(self, usage: Any) -> None:
         """Pull token counts off an ADK event's `usage_metadata`.
 
-        Field names differ slightly across ADK versions; we probe
-        defensively. Prompt tokens are taken as max (they are reported
-        cumulatively); candidate tokens are summed.
+        google-genai field names differ slightly across SDK versions;
+        we probe defensively. Prompt + cached are taken as max (ADK
+        reports cumulatively); candidate + thinking are summed.
         """
         if usage is None:
             return
-        prompt = (
-            getattr(usage, "prompt_token_count", None)
-            or getattr(usage, "prompt_tokens", None)
-            or 0
+
+        def pick(*names: str) -> int:
+            for n in names:
+                v = getattr(usage, n, None)
+                if v is not None:
+                    return int(v)
+            return 0
+
+        prompt = pick("prompt_token_count", "prompt_tokens")
+        cached = pick("cached_content_token_count", "cached_tokens")
+        candidate = pick(
+            "candidates_token_count", "candidate_tokens", "completion_tokens"
         )
-        candidate = (
-            getattr(usage, "candidates_token_count", None)
-            or getattr(usage, "candidate_tokens", None)
-            or getattr(usage, "completion_tokens", None)
-            or 0
+        thinking = pick(
+            "thoughts_token_count", "thinking_token_count", "reasoning_token_count"
         )
-        self.input_tokens = max(self.input_tokens, int(prompt or 0))
-        self.output_tokens += int(candidate or 0)
+
+        self.input_tokens = max(self.input_tokens, prompt)
+        self.cached_tokens = max(self.cached_tokens, cached)
+        self.output_tokens += candidate
+        self.thinking_tokens += thinking
+        self.model_calls += 1
 
     def record_tool_call(self) -> None:
         self.tool_calls += 1
@@ -108,17 +138,41 @@ class TurnMetrics:
             return round((b - a) * 1000, 1)
 
         in_price, out_price = _price_of(self.model)
+        billable_prompt = max(0, self.input_tokens - self.cached_tokens)
         cost_usd = (
-            (self.input_tokens / 1_000_000) * in_price
+            (billable_prompt / 1_000_000) * in_price
+            + (self.cached_tokens / 1_000_000) * in_price * _CACHE_DISCOUNT
             + (self.output_tokens / 1_000_000) * out_price
+            + (self.thinking_tokens / 1_000_000) * out_price
         )
+
+        # tokens/sec over the streaming window (first_token → finished).
+        tps: float | None = None
+        if self.first_token_at and self.finished_at:
+            window = self.finished_at - self.first_token_at
+            if window > 0 and self.output_tokens > 0:
+                tps = round(self.output_tokens / window, 1)
+
+        cache_ratio = (
+            round(self.cached_tokens / self.input_tokens, 3)
+            if self.input_tokens else 0.0
+        )
+
         return {
             "model": self.model,
             "ttft_ms": ms(self.started_at, self.first_token_at),
             "total_ms": ms(self.started_at, self.finished_at),
+            "tokens_per_second": tps,
             "input_tokens": self.input_tokens,
+            "cached_tokens": self.cached_tokens,
             "output_tokens": self.output_tokens,
+            "thinking_tokens": self.thinking_tokens,
+            "total_tokens": (
+                self.input_tokens + self.output_tokens + self.thinking_tokens
+            ),
+            "cache_hit_ratio": cache_ratio,
             "tool_calls": self.tool_calls,
+            "model_calls": self.model_calls,
             "cost_usd": round(cost_usd, 6),
             "cost_inr": round(cost_usd * _USD_TO_INR, 4),
             "error": self.error,
@@ -138,8 +192,9 @@ class MetricsStore:
         turns = list(self.turns)
         if not turns:
             return {"count": 0}
-        ttft = [t["ttft_ms"] for t in turns if t.get("ttft_ms") is not None]
-        total = [t["total_ms"] for t in turns if t.get("total_ms") is not None]
+
+        def vals(key: str) -> list[float]:
+            return [t[key] for t in turns if t.get(key) is not None]
 
         def p(values: list[float], q: float) -> float | None:
             if not values:
@@ -148,17 +203,40 @@ class MetricsStore:
             k = max(0, min(len(ordered) - 1, int(round((len(ordered) - 1) * q))))
             return round(ordered[k], 1)
 
+        ttft = vals("ttft_ms")
+        total = vals("total_ms")
+        tps = vals("tokens_per_second")
+
+        total_in = sum(t.get("input_tokens", 0) for t in turns)
+        total_cached = sum(t.get("cached_tokens", 0) for t in turns)
+
         return {
             "count": len(turns),
+            # latency
             "ttft_p50_ms": round(statistics.median(ttft), 1) if ttft else None,
             "ttft_p95_ms": p(ttft, 0.95),
             "latency_p50_ms": round(statistics.median(total), 1) if total else None,
             "latency_p95_ms": p(total, 0.95),
-            "total_input_tokens": sum(t.get("input_tokens", 0) for t in turns),
+            "tokens_per_second_p50": (
+                round(statistics.median(tps), 1) if tps else None
+            ),
+            # tokens
+            "total_input_tokens": total_in,
+            "total_cached_tokens": total_cached,
             "total_output_tokens": sum(t.get("output_tokens", 0) for t in turns),
+            "total_thinking_tokens": sum(t.get("thinking_tokens", 0) for t in turns),
+            "total_tokens": sum(t.get("total_tokens", 0) for t in turns),
+            "cache_hit_ratio": (
+                round(total_cached / total_in, 3) if total_in else 0.0
+            ),
+            # orchestration
             "total_tool_calls": sum(t.get("tool_calls", 0) for t in turns),
+            "total_model_calls": sum(t.get("model_calls", 0) for t in turns),
+            # cost
             "total_cost_inr": round(sum(t.get("cost_inr") or 0 for t in turns), 4),
             "total_cost_usd": round(sum(t.get("cost_usd") or 0 for t in turns), 6),
+            # errors
+            "error_count": sum(1 for t in turns if t.get("error")),
         }
 
     def snapshot(self) -> dict:
