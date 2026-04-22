@@ -28,6 +28,19 @@ from pydantic import BaseModel
 
 load_dotenv()  # reads .env in the working dir before the agent imports
 
+_has_key = bool(os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY"))
+_use_vertex = os.environ.get("GOOGLE_GENAI_USE_VERTEXAI", "").lower() in {"1", "true", "yes"}
+if not (_has_key or _use_vertex):
+    print(
+        "[concierge] WARNING: no GOOGLE_API_KEY or GEMINI_API_KEY set and "
+        "GOOGLE_GENAI_USE_VERTEXAI is not true. Chat requests will fail "
+        "with an auth error. Set the key in .env or export it before "
+        "starting the server.",
+        flush=True,
+    )
+else:
+    print(f"[concierge] auth ok · vertex={_use_vertex} · api_key={'set' if _has_key else 'unset'}", flush=True)
+
 from concierge import root_agent  # noqa: E402
 from concierge.metrics import MetricsStore, TurnMetrics  # noqa: E402
 

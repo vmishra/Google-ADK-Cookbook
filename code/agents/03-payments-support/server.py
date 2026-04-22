@@ -38,6 +38,16 @@ from google.genai import types
 
 load_dotenv()
 
+_has_key = bool(os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY"))
+_use_vertex = os.environ.get("GOOGLE_GENAI_USE_VERTEXAI", "").lower() in {"1", "true", "yes"}
+if not (_has_key or _use_vertex):
+    print(
+        "[payments-support] WARNING: no GOOGLE_API_KEY / GEMINI_API_KEY and "
+        "GOOGLE_GENAI_USE_VERTEXAI not true. Voice calls will fail.", flush=True,
+    )
+else:
+    print(f"[payments-support] auth ok · vertex={_use_vertex} · api_key={'set' if _has_key else 'unset'}", flush=True)
+
 from payments_support import root_agent  # noqa: E402
 from payments_support.metrics import MetricsStore, TurnMetrics  # noqa: E402
 

@@ -166,10 +166,10 @@ export function ChatPanel({ baseUrl, prompts, onTurn, onActive, showAuthor }: Pr
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-[var(--elev-1)]">
       <div
         ref={scrollRef}
-        className="flex-1 overflow-auto px-5 py-6 space-y-5"
+        className="flex-1 overflow-auto px-6 py-6 space-y-5"
         aria-live="polite"
       >
         {turns.length === 0 && (
@@ -178,7 +178,7 @@ export function ChatPanel({ baseUrl, prompts, onTurn, onActive, showAuthor }: Pr
               variants={fadeRise}
               initial="initial"
               animate="animate"
-              className="font-[var(--font-serif)] italic text-[var(--text-subtle)] text-[20px] text-center max-w-[360px]"
+              className="font-[var(--font-serif)] italic text-[var(--text-muted)] text-[22px] text-center max-w-[360px]"
             >
               What shall we arrange?
             </motion.p>
@@ -217,7 +217,7 @@ export function ChatPanel({ baseUrl, prompts, onTurn, onActive, showAuthor }: Pr
 
       <form
         onSubmit={(e) => { e.preventDefault(); send(input); }}
-        className="border-t border-[var(--border)] px-5 py-4 flex items-end gap-3"
+        className="border-t border-[var(--border)] px-5 py-4 flex items-end gap-3 bg-[var(--elev-2)]"
       >
         <textarea
           value={input}
@@ -230,7 +230,8 @@ export function ChatPanel({ baseUrl, prompts, onTurn, onActive, showAuthor }: Pr
           }}
           rows={1}
           placeholder=""
-          className="flex-1 resize-none bg-[var(--surface-raised)] border border-[var(--border)] rounded-[var(--radius-md)] px-3.5 py-2.5 text-[14px] font-[var(--font-sans)] focus-visible:outline-none focus-within:border-[var(--border-strong)] min-h-[40px] max-h-[160px]"
+          aria-label="Message"
+          className="flex-1 resize-none bg-[var(--surface)] border border-[var(--border-strong)] rounded-[var(--radius-md)] px-3.5 py-2.5 text-[14px] text-[var(--text)] font-[var(--font-sans)] placeholder:text-[var(--text-subtle)] focus-visible:outline-none focus-within:border-[var(--accent)] min-h-[40px] max-h-[160px] shadow-[var(--shadow-1)]"
           style={{ height: "auto" }}
         />
         <button

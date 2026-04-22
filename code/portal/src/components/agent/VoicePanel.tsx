@@ -159,15 +159,15 @@ export function VoicePanel({ baseUrl, onTurn, onActive }: Props) {
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-auto px-5 py-6 space-y-4" aria-live="polite">
+    <div className="flex flex-col h-full bg-[var(--elev-1)]">
+      <div className="flex-1 overflow-auto px-6 py-6 space-y-4" aria-live="polite">
         {transcript.length === 0 && tools.length === 0 && (
           <div className="h-full flex items-center justify-center">
             <motion.p
               variants={fadeRise}
               initial="initial"
               animate="animate"
-              className="font-[var(--font-serif)] italic text-[var(--text-subtle)] text-[20px] text-center max-w-[360px]"
+              className="font-[var(--font-serif)] italic text-[var(--text-muted)] text-[22px] text-center max-w-[380px]"
             >
               Connect, then press and hold to speak — or just start talking.
             </motion.p>
@@ -209,7 +209,7 @@ export function VoicePanel({ baseUrl, onTurn, onActive }: Props) {
           {error}
         </div>
       )}
-      <div className="border-t border-[var(--border)] px-5 py-4 flex items-center gap-3">
+      <div className="border-t border-[var(--border)] px-5 py-4 flex items-center gap-3 bg-[var(--elev-2)]">
         <button
           type="button"
           onClick={connected ? stopEverything : connect}
