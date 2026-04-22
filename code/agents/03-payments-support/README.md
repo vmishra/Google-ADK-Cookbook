@@ -70,7 +70,7 @@ needs, and read confirmation IDs digit-by-digit.
 
 ## Model note
 
-The workshop target spec mentioned *Gemini 3.1 Flash Live*. As of
-April 2026 that exact model string is not yet public; the agent
-defaults to `gemini-live-2.5-flash-native-audio` (Vertex GA). The
-`VOICE_MODEL` env var swaps it the moment the 3.1 Live variant ships.
+Defaults to `gemini-3.1-flash-live-preview` — the 3.1-family native
+audio model currently in preview. If that is not enabled on your
+project, swap `VOICE_MODEL` to `gemini-live-2.5-flash-native-audio`
+(Vertex GA). No other code changes required.

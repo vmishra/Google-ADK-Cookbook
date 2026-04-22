@@ -31,9 +31,10 @@ from typing import Any, Deque
 # USD per million tokens, (input, output). Rough as of April 2026.
 # Update in one place if Google publishes new prices.
 _PRICES: dict[str, tuple[float, float]] = {
-    "gemini-3.1-pro": (1.25, 5.00),
-    "gemini-3.1-flash": (0.075, 0.30),
-    "gemini-3.1-flash-lite": (0.02, 0.08),
+    "gemini-3.1-pro-preview": (1.25, 5.00),
+    "gemini-3-flash-preview": (0.075, 0.30),
+    "gemini-3.1-flash-lite-preview": (0.02, 0.08),
+    "gemini-3.1-flash-live-preview": (0.30, 2.50),
     "gemini-live-2.5-flash-native-audio": (0.30, 2.50),
     "gemini-2.5-flash-native-audio-preview-12-2025": (0.30, 2.50),
     "gemini-2.5-computer-use-preview-10-2025": (1.25, 5.00),
@@ -42,7 +43,7 @@ _USD_TO_INR = 84.0
 
 
 def _price_of(model: str) -> tuple[float, float]:
-    # Longest prefix match so `gemini-3.1-flash-*` hits the right tier.
+    # Longest prefix match so `gemini-3-flash-preview-*` hits the right tier.
     best = ""
     for prefix in _PRICES:
         if model.startswith(prefix) and len(prefix) > len(best):

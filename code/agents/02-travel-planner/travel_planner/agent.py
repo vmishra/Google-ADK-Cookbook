@@ -23,7 +23,7 @@ from google.adk.agents import LlmAgent, SequentialAgent
 from .sub_agents.researchers import parallel_researchers
 
 
-PRIMARY_MODEL = os.environ.get("PLANNER_MODEL", "gemini-3.1-flash")
+PRIMARY_MODEL = os.environ.get("PLANNER_MODEL", "gemini-3-flash-preview")
 
 
 planner = LlmAgent(

@@ -50,7 +50,7 @@ def _primary_model() -> str:
         model = getattr(sub, "model", None)
         if model:
             return model
-    return "gemini-3.1-flash"
+    return "gemini-3-flash-preview"
 
 
 class ChatInput(BaseModel):

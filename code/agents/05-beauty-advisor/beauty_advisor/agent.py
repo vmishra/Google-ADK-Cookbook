@@ -51,7 +51,7 @@ from .sub_agents.makeup.agent import makeup_coordinator
 from .sub_agents.skincare.agent import skincare_coordinator
 
 
-ROOT_MODEL = os.environ.get("BEAUTY_ROOT_MODEL", "gemini-3.1-flash")
+ROOT_MODEL = os.environ.get("BEAUTY_ROOT_MODEL", "gemini-3-flash-preview")
 
 
 ROOT_INSTRUCTION = """\

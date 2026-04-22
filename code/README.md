@@ -55,12 +55,12 @@ reads. Copy it to `.env`, fill in the key, and the server picks it up.
 
 Models used across the stack (April 2026):
 
-- `gemini-3.1-flash` — primary reasoning on agents 01, 02, 05.
-- `gemini-3.1-flash-lite` — cheaper sub-agents in the planner and
+- `gemini-3-flash-preview` — primary reasoning on agents 01, 02, 05.
+- `gemini-3.1-flash-lite-preview` — cheaper sub-agents in the planner and
   the beauty advisor's specialists.
-- `gemini-live-2.5-flash-native-audio` — native-audio voice (agent 03).
-  *Gemini 3.1 Flash Live is not yet public; swap `VOICE_MODEL` in
-  `.env` once it ships.*
+- `gemini-3.1-flash-live-preview` — native-audio voice (agent 03).
+  Falls back to `gemini-live-2.5-flash-native-audio` (Vertex GA) if
+  the preview is not enabled on your project — swap `VOICE_MODEL`.
 - `gemini-2.5-computer-use-preview-10-2025` — browser control (agent 04).
 
 Every model ID is overridable via the agent's `.env`.

@@ -14,7 +14,7 @@ from google.adk.agents import LlmAgent, ParallelAgent
 from ..tools import search_activities, search_flights, search_hotels
 
 
-WORKER_MODEL = os.environ.get("PLANNER_WORKER_MODEL", "gemini-3.1-flash-lite")
+WORKER_MODEL = os.environ.get("PLANNER_WORKER_MODEL", "gemini-3.1-flash-lite-preview")
 
 
 flight_researcher = LlmAgent(

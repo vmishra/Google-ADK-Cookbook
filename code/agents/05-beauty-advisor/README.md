@@ -6,7 +6,7 @@ the most feature-dense example in the bundle.
 ## Shape
 
 ```
-root_advisor                                       gemini-3.1-flash
+root_advisor                                       gemini-3-flash-preview
 ├── profile memory tools                           remember_skin, remember_hair,
 │                                                  remember_preferences,
 │                                                  get_profile, clear_profile
@@ -14,20 +14,20 @@ root_advisor                                       gemini-3.1-flash
 │                                                  (5 skills, progressive disclosure)
 │
 └── sub_agents (delegation)
-    ├── skincare_coordinator                       gemini-3.1-flash
-    │   ├── AgentTool(cleanser_specialist)         gemini-3.1-flash-lite
-    │   ├── AgentTool(treatment_specialist)        gemini-3.1-flash-lite
-    │   └── AgentTool(moisturiser_spf_specialist)  gemini-3.1-flash-lite
+    ├── skincare_coordinator                       gemini-3-flash-preview
+    │   ├── AgentTool(cleanser_specialist)         gemini-3.1-flash-lite-preview
+    │   ├── AgentTool(treatment_specialist)        gemini-3.1-flash-lite-preview
+    │   └── AgentTool(moisturiser_spf_specialist)  gemini-3.1-flash-lite-preview
     │
-    ├── makeup_coordinator                         gemini-3.1-flash
-    │   ├── AgentTool(primer_specialist)           gemini-3.1-flash-lite
-    │   ├── AgentTool(foundation_specialist)       gemini-3.1-flash-lite
-    │   └── AgentTool(setting_specialist)          gemini-3.1-flash-lite
+    ├── makeup_coordinator                         gemini-3-flash-preview
+    │   ├── AgentTool(primer_specialist)           gemini-3.1-flash-lite-preview
+    │   ├── AgentTool(foundation_specialist)       gemini-3.1-flash-lite-preview
+    │   └── AgentTool(setting_specialist)          gemini-3.1-flash-lite-preview
     │
-    └── haircare_coordinator                       gemini-3.1-flash
-        ├── AgentTool(wash_specialist)             gemini-3.1-flash-lite
-        ├── AgentTool(hair_treatment_specialist)   gemini-3.1-flash-lite
-        └── AgentTool(styling_specialist)          gemini-3.1-flash-lite
+    └── haircare_coordinator                       gemini-3-flash-preview
+        ├── AgentTool(wash_specialist)             gemini-3.1-flash-lite-preview
+        ├── AgentTool(hair_treatment_specialist)   gemini-3.1-flash-lite-preview
+        └── AgentTool(styling_specialist)          gemini-3.1-flash-lite-preview
 ```
 
 Three tiers of model selection: the root speaks with the customer and

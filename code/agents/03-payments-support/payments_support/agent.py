@@ -5,9 +5,10 @@ directly; we do not wire a separate ASR/TTS chain. Tools are the same
 shape as any other ADK agent — plain Python functions — and are called
 mid-conversation while the model is still streaming audio.
 
-Model note: as of April 2026 the GA Live model is
-`gemini-live-2.5-flash-native-audio`. The `VOICE_MODEL` env var lets
-you swap it in future without editing this file.
+Model note: defaults to `gemini-3.1-flash-live-preview` (the 3.1-family
+native-audio preview). `VOICE_MODEL` env swaps it — fall back to
+`gemini-live-2.5-flash-native-audio` (Vertex GA) if the preview is not
+enabled on your project.
 """
 from __future__ import annotations
 
@@ -25,7 +26,7 @@ from .tools import (
 
 
 VOICE_MODEL = os.environ.get(
-    "VOICE_MODEL", "gemini-live-2.5-flash-native-audio"
+    "VOICE_MODEL", "gemini-3.1-flash-live-preview"
 )
 
 

@@ -38,7 +38,7 @@ export const AGENTS: AgentMeta[] = [
     baseUrl: "http://127.0.0.1:8001",
     modality: "text",
     pattern: "LlmAgent + 8 function tools",
-    models: ["gemini-3.1-flash"],
+    models: ["gemini-3-flash-preview"],
     toolCount: 8,
     difficulty: "basic",
     notice: [
@@ -67,7 +67,7 @@ export const AGENTS: AgentMeta[] = [
     baseUrl: "http://127.0.0.1:8002",
     modality: "deep-research",
     pattern: "SequentialAgent(planner, ParallelAgent(…), composer)",
-    models: ["gemini-3.1-flash", "gemini-3.1-flash-lite"],
+    models: ["gemini-3-flash-preview", "gemini-3.1-flash-lite-preview"],
     difficulty: "intermediate",
     notice: [
       "Three phases run as one SSE stream; portal shows which sub-agent is speaking.",
@@ -93,7 +93,7 @@ export const AGENTS: AgentMeta[] = [
     baseUrl: "http://127.0.0.1:8003",
     modality: "voice",
     pattern: "LlmAgent + run_live() + LiveRequestQueue",
-    models: ["gemini-live-2.5-flash-native-audio"],
+    models: ["gemini-3.1-flash-live-preview"],
     difficulty: "advanced",
     notice: [
       "Speech-to-speech, not ASR + TTS. Transcripts are a side-channel.",
@@ -148,7 +148,7 @@ export const AGENTS: AgentMeta[] = [
     baseUrl: "http://127.0.0.1:8005",
     modality: "text",
     pattern: "LlmAgent + sub_agents + AgentTool specialists",
-    models: ["gemini-3.1-flash", "gemini-3.1-flash-lite"],
+    models: ["gemini-3-flash-preview", "gemini-3.1-flash-lite-preview"],
     difficulty: "advanced",
     notice: [
       "Two kinds of delegation — sub_agents for transfer, AgentTool for composition.",

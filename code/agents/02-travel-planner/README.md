@@ -29,8 +29,8 @@ A deep-research travel planner built as a **three-phase pipeline**:
   each reads and writes `tool_context.state` via `output_key`. This
   is what makes the parallelism safe.
 - **Two model tiers.** The planner and composer use
-  `gemini-3.1-flash`; the three researchers use
-  `gemini-3.1-flash-lite` for tool-heavy, latency-sensitive work.
+  `gemini-3-flash-preview`; the three researchers use
+  `gemini-3.1-flash-lite-preview` for tool-heavy, latency-sensitive work.
 - **Reproducible mocks.** Every search tool seeds randomness on its
   inputs, so a given brief always produces the same fixtures — useful
   for live demos.

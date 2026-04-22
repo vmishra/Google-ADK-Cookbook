@@ -22,7 +22,7 @@ from .tools import (
 )
 
 
-MODEL = os.environ.get("CONCIERGE_MODEL", "gemini-3.1-flash")
+MODEL = os.environ.get("CONCIERGE_MODEL", "gemini-3-flash-preview")
 
 
 INSTRUCTION = """\
