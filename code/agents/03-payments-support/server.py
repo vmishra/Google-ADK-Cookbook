@@ -145,6 +145,7 @@ async def _forward_model_to_browser(
             run_config=_run_config(),
         ):
             turn.record_usage(getattr(event, "usage_metadata", None))
+            turn.record_event_signals(event)
             for part in (event.content.parts if event.content else []):
                 if part.inline_data and part.inline_data.data:
                     turn.mark_first_token()

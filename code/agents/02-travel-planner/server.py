@@ -93,6 +93,7 @@ async def _stream(session_id: str, message: str) -> AsyncIterator[str]:
         ):
             author = event.author or ""
             turn.record_usage(getattr(event, "usage_metadata", None))
+            turn.record_event_signals(event)
             yield _sse({"kind": "author", "author": author})
             for part in (event.content.parts if event.content else []):
                 if part.text:

@@ -59,6 +59,23 @@ _USD_TO_INR = 84.0
 _CACHE_DISCOUNT = 0.25
 
 
+def _merge_modalities(target: dict[str, int], details: Any) -> None:
+    """Accumulate ModalityTokenCount entries into a {modality: tokens} dict."""
+    if not details:
+        return
+    try:
+        for entry in details:
+            modality = getattr(entry, "modality", None)
+            count = getattr(entry, "token_count", None)
+            if modality is None or count is None:
+                continue
+            name = getattr(modality, "name", str(modality))
+            target[name] = target.get(name, 0) + int(count)
+    except TypeError:
+        # details wasn't iterable — ignore
+        return
+
+
 def _price_of(model: str) -> tuple[float, float]:
     # Longest prefix match so `gemini-3-flash-preview-*` hits the right tier.
     best = ""
@@ -72,7 +89,10 @@ class TurnMetrics:
     __slots__ = (
         "model", "started_at", "first_token_at", "finished_at",
         "input_tokens", "cached_tokens", "output_tokens", "thinking_tokens",
-        "tool_calls", "model_calls", "error",
+        "tool_use_prompt_tokens",
+        "modalities_in", "modalities_out", "modalities_cached",
+        "tool_calls", "model_calls", "partial_events", "interrupted",
+        "finish_reason", "error",
     )
 
     def __init__(self, model: str):
@@ -84,8 +104,16 @@ class TurnMetrics:
         self.cached_tokens: int = 0
         self.output_tokens: int = 0
         self.thinking_tokens: int = 0
+        self.tool_use_prompt_tokens: int = 0
+        # Per-modality token breakdowns, keyed by "TEXT" / "AUDIO" / "IMAGE" / "VIDEO".
+        self.modalities_in: dict[str, int] = {}
+        self.modalities_out: dict[str, int] = {}
+        self.modalities_cached: dict[str, int] = {}
         self.tool_calls: int = 0
         self.model_calls: int = 0
+        self.partial_events: int = 0
+        self.interrupted: bool = False
+        self.finish_reason: str | None = None
         self.error: str | None = None
 
     def mark_first_token(self) -> None:
@@ -93,11 +121,12 @@ class TurnMetrics:
             self.first_token_at = time.monotonic()
 
     def record_usage(self, usage: Any) -> None:
-        """Pull token counts off an ADK event's `usage_metadata`.
+        """Pull every field off an ADK event's `usage_metadata`.
 
         google-genai field names differ slightly across SDK versions;
-        we probe defensively. Prompt + cached are taken as max (ADK
-        reports cumulatively); candidate + thinking are summed.
+        we probe defensively. Prompt + cached + tool-use are taken as
+        max (ADK reports cumulatively); candidate + thinking are summed.
+        Per-modality details are merged in by summing across events.
         """
         if usage is None:
             return
@@ -117,12 +146,43 @@ class TurnMetrics:
         thinking = pick(
             "thoughts_token_count", "thinking_token_count", "reasoning_token_count"
         )
+        tool_use_prompt = pick(
+            "tool_use_prompt_token_count", "tool_use_prompt_tokens"
+        )
 
         self.input_tokens = max(self.input_tokens, prompt)
         self.cached_tokens = max(self.cached_tokens, cached)
         self.output_tokens += candidate
         self.thinking_tokens += thinking
+        self.tool_use_prompt_tokens = max(self.tool_use_prompt_tokens, tool_use_prompt)
         self.model_calls += 1
+
+        # Per-modality breakdowns — list[ModalityTokenCount]
+        _merge_modalities(
+            self.modalities_in, getattr(usage, "prompt_tokens_details", None)
+        )
+        _merge_modalities(
+            self.modalities_out, getattr(usage, "candidates_tokens_details", None)
+        )
+        _merge_modalities(
+            self.modalities_cached, getattr(usage, "cache_tokens_details", None)
+        )
+
+    def record_event_signals(self, event: Any) -> None:
+        """Harvest non-usage signals from an ADK event: partial flag,
+        interrupted flag, finish_reason. Safe to call on every event."""
+        if getattr(event, "partial", False):
+            self.partial_events += 1
+        if getattr(event, "interrupted", False):
+            self.interrupted = True
+        fr = getattr(event, "finish_reason", None)
+        if fr:
+            # Keep the most recent non-STOP reason, else last STOP.
+            name = getattr(fr, "name", str(fr))
+            if name and name != "STOP":
+                self.finish_reason = name
+            elif self.finish_reason is None:
+                self.finish_reason = name
 
     def record_tool_call(self) -> None:
         self.tool_calls += 1
@@ -160,19 +220,33 @@ class TurnMetrics:
 
         return {
             "model": self.model,
+            # latency
             "ttft_ms": ms(self.started_at, self.first_token_at),
             "total_ms": ms(self.started_at, self.finished_at),
             "tokens_per_second": tps,
+            # tokens
             "input_tokens": self.input_tokens,
             "cached_tokens": self.cached_tokens,
             "output_tokens": self.output_tokens,
             "thinking_tokens": self.thinking_tokens,
+            "tool_use_prompt_tokens": self.tool_use_prompt_tokens,
             "total_tokens": (
                 self.input_tokens + self.output_tokens + self.thinking_tokens
             ),
             "cache_hit_ratio": cache_ratio,
+            # per-modality breakdowns (present when the response carried them)
+            "modalities": {
+                "input": dict(self.modalities_in),
+                "output": dict(self.modalities_out),
+                "cached": dict(self.modalities_cached),
+            },
+            # orchestration + streaming signals
             "tool_calls": self.tool_calls,
             "model_calls": self.model_calls,
+            "partial_events": self.partial_events,
+            "interrupted": self.interrupted,
+            "finish_reason": self.finish_reason,
+            # cost (estimate)
             "cost_usd": round(cost_usd, 6),
             "cost_inr": round(cost_usd * _USD_TO_INR, 4),
             "error": self.error,

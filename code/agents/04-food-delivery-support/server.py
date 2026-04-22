@@ -95,6 +95,7 @@ async def _stream(session_id: str, message: str) -> AsyncIterator[str]:
             user_id=USER_ID, session_id=session_id, new_message=new_message
         ):
             turn.record_usage(getattr(event, "usage_metadata", None))
+            turn.record_event_signals(event)
             for part in (event.content.parts if event.content else []):
                 if part.text:
                     turn.mark_first_token()
