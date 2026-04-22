@@ -166,84 +166,103 @@ export function ChatPanel({ baseUrl, prompts, onTurn, onActive, showAuthor }: Pr
   }
 
   return (
-    <div className="flex flex-col h-full bg-[var(--elev-1)]">
+    <div className="flex flex-col h-full bg-[var(--surface)]">
+      {/* Scroll area, max-width for editorial line length */}
       <div
         ref={scrollRef}
-        className="flex-1 overflow-auto px-6 py-6 space-y-5"
+        className="flex-1 overflow-auto"
         aria-live="polite"
       >
-        {turns.length === 0 && (
-          <div className="h-full flex items-center justify-center">
-            <motion.p
-              variants={fadeRise}
-              initial="initial"
-              animate="animate"
-              className="font-[var(--font-serif)] italic text-[var(--text-muted)] text-[22px] text-center max-w-[360px]"
-            >
-              What shall we arrange?
-            </motion.p>
-          </div>
-        )}
-        <AnimatePresence initial={false}>
-          {turns.map((t, i) => (
-            <motion.div
-              key={i}
-              variants={fadeRise}
-              initial="initial"
-              animate="animate"
-              layout={false}
-            >
-              {t.kind === "user" ? (
-                <UserBubble text={t.text} />
-              ) : (
-                <ModelBubble turn={t} showAuthor={showAuthor} />
+        <div className="max-w-[780px] mx-auto px-8 py-10 space-y-6">
+          {turns.length === 0 && (
+            <div className="min-h-[320px] flex flex-col items-center justify-center gap-6">
+              <motion.p
+                variants={fadeRise}
+                initial="initial"
+                animate="animate"
+                className="font-[var(--font-serif)] italic text-[var(--text-muted)] text-[26px] leading-[1.3] text-center max-w-[420px]"
+              >
+                What shall we arrange?
+              </motion.p>
+              {prompts.length > 0 && (
+                <div className="flex flex-wrap gap-2 justify-center max-w-[520px]">
+                  {prompts.slice(0, 3).map((p) => (
+                    <motion.button
+                      key={p}
+                      type="button"
+                      onClick={() => send(p)}
+                      variants={chipEnter}
+                      initial="initial"
+                      animate="animate"
+                      className="text-left text-[13px] leading-[1.55] text-[var(--text-muted)] px-3.5 py-2 rounded-[var(--radius-md)] border border-[var(--border)] hover:border-[var(--border-strong)] hover:bg-[var(--elev-1)] hover:text-[var(--text)] transition-colors max-w-[260px]"
+                    >
+                      {truncate(p, 72)}
+                    </motion.button>
+                  ))}
+                </div>
               )}
-            </motion.div>
-          ))}
-        </AnimatePresence>
+            </div>
+          )}
+          <AnimatePresence initial={false}>
+            {turns.map((t, i) => (
+              <motion.div
+                key={i}
+                variants={fadeRise}
+                initial="initial"
+                animate="animate"
+                layout={false}
+              >
+                {t.kind === "user" ? (
+                  <UserBubble text={t.text} />
+                ) : (
+                  <ModelBubble turn={t} showAuthor={showAuthor} />
+                )}
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
       </div>
 
-      {turns.length === 0 && prompts.length > 0 && (
-        <div className="px-5 pb-3 flex flex-wrap gap-1.5">
-          {prompts.slice(0, 3).map((p) => (
-            <motion.div key={p} variants={chipEnter} initial="initial" animate="animate">
-              <Chip tone="trace" interactive onClick={() => send(p)}>
-                {truncate(p, 64)}
-              </Chip>
-            </motion.div>
-          ))}
+      {/* Composer — its own card, inset from the edges, clearly visible. */}
+      <div className="shrink-0 px-6 pb-5 pt-2">
+        <div className="max-w-[780px] mx-auto">
+          <form
+            onSubmit={(e) => { e.preventDefault(); send(input); }}
+            className="relative flex items-end gap-2 rounded-[var(--radius-xl)] border bg-[var(--elev-1)] pl-4 pr-2 py-2.5 focus-within:border-[var(--accent)] transition-colors"
+            style={{
+              borderColor: "var(--border-strong)",
+              boxShadow: "var(--shadow-2)",
+            }}
+          >
+            <textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  send(input);
+                }
+              }}
+              rows={1}
+              placeholder=""
+              aria-label="Message"
+              className="flex-1 resize-none bg-transparent border-0 outline-none text-[14.5px] text-[var(--text)] font-[var(--font-sans)] leading-[1.55] min-h-[36px] max-h-[220px] py-1.5"
+              style={{ height: "auto" }}
+            />
+            <button
+              type="submit"
+              disabled={busy || !input.trim()}
+              aria-label="Send message"
+              className="h-9 w-9 rounded-full bg-[var(--accent)] text-[oklch(16%_0_0)] flex items-center justify-center shrink-0 disabled:opacity-30 hover:brightness-[1.04] active:brightness-[0.98] transition-[filter,opacity] duration-150"
+            >
+              <Send size={15} strokeWidth={1.9} />
+            </button>
+          </form>
+          <div className="text-center text-[10.5px] tracking-[0.22em] uppercase font-[var(--font-mono)] text-[var(--text-subtle)] mt-2.5">
+            enter to send · shift + enter for a new line
+          </div>
         </div>
-      )}
-
-      <form
-        onSubmit={(e) => { e.preventDefault(); send(input); }}
-        className="border-t border-[var(--border)] px-5 py-4 flex items-end gap-3 bg-[var(--elev-2)]"
-      >
-        <textarea
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              send(input);
-            }
-          }}
-          rows={1}
-          placeholder=""
-          aria-label="Message"
-          className="flex-1 resize-none bg-[var(--surface)] border border-[var(--border-strong)] rounded-[var(--radius-md)] px-3.5 py-2.5 text-[14px] text-[var(--text)] font-[var(--font-sans)] placeholder:text-[var(--text-subtle)] focus-visible:outline-none focus-within:border-[var(--accent)] min-h-[40px] max-h-[160px] shadow-[var(--shadow-1)]"
-          style={{ height: "auto" }}
-        />
-        <button
-          type="submit"
-          disabled={busy || !input.trim()}
-          aria-label="Send message"
-          className="h-10 w-10 rounded-full bg-[var(--accent)] text-[oklch(16%_0_0)] flex items-center justify-center disabled:opacity-35 hover:brightness-[1.04] active:brightness-[0.98] transition-[filter,opacity]"
-          style={{ transition: "filter 150ms, opacity 180ms ease" }}
-        >
-          <Send size={16} strokeWidth={1.8} />
-        </button>
-      </form>
+      </div>
     </div>
   );
 }
