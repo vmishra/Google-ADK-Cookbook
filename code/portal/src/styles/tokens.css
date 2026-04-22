@@ -67,35 +67,42 @@
 
 /* Light is a sibling palette, not an inversion. */
 :root[data-theme="light"] {
-  --surface:            oklch(98% 0.004 80);
-  --surface-raised:     oklch(99% 0.003 80);
-  --elev-1:             oklch(96% 0.004 80);
-  --elev-2:             oklch(93% 0.005 80);
+  /* Warm paper-cream stack. Hue ~75 leans gently to the amber side
+     of warm — reads as a printed page, not a clinical white dashboard.
+     Separation between the surfaces is wider than most light systems
+     because we want the chat composer, metric ribbon, and sidebar to
+     read as distinct planes without shadows doing the heavy lifting. */
+  --surface:            oklch(97.5% 0.008 75);
+  --surface-raised:     oklch(99.2% 0.005 75);
+  --elev-1:             oklch(95% 0.010 75);
+  --elev-2:             oklch(92% 0.012 75);
 
-  --border:             oklch(90% 0.006 80);
-  --border-strong:      oklch(82% 0.008 80);
+  --border:             oklch(87% 0.012 75);
+  --border-strong:      oklch(75% 0.014 75);
 
-  --text:               oklch(18% 0.005 260);
-  --text-muted:         oklch(42% 0.010 260);
-  --text-subtle:        oklch(58% 0.010 260);
-  --text-faint:         oklch(72% 0.010 260);
+  --text:               oklch(22% 0.008 60);
+  --text-muted:         oklch(42% 0.012 60);
+  --text-subtle:        oklch(55% 0.012 60);
+  --text-faint:         oklch(70% 0.012 60);
 
-  --accent:             oklch(58% 0.130 65);
-  --accent-soft:        oklch(58% 0.130 65 / 0.12);
-  --accent-hairline:    oklch(58% 0.130 65 / 0.45);
-  --accent-deep:        oklch(44% 0.135 65);
+  /* Warm clay accent — Anthropic/Claude register. 54% L so it passes
+     AA over cream, 0.14 chroma so it has weight without neon. */
+  --accent:             oklch(54% 0.140 52);
+  --accent-soft:        oklch(54% 0.140 52 / 0.12);
+  --accent-hairline:    oklch(54% 0.140 52 / 0.55);
+  --accent-deep:        oklch(40% 0.148 52);
 
-  --trace:              oklch(48% 0.090 200);
-  --trace-soft:         oklch(48% 0.090 200 / 0.12);
-  --trace-hairline:     oklch(48% 0.090 200 / 0.45);
+  --trace:              oklch(44% 0.090 200);
+  --trace-soft:         oklch(44% 0.090 200 / 0.12);
+  --trace-hairline:     oklch(44% 0.090 200 / 0.50);
 
   --shadow-1:
-    0 1px 0 oklch(100% 0 0 / 0.60) inset,
-    0 1px 2px oklch(0% 0 0 / 0.08);
+    0 1px 0 oklch(100% 0 0 / 0.65) inset,
+    0 1px 2px oklch(25% 0.02 60 / 0.08);
   --shadow-2:
-    0 1px 0 oklch(100% 0 0 / 0.70) inset,
-    0 6px 24px -8px oklch(0% 0 0 / 0.12);
-  --shadow-lift:
     0 1px 0 oklch(100% 0 0 / 0.80) inset,
-    0 18px 48px -16px oklch(0% 0 0 / 0.18);
+    0 8px 28px -10px oklch(25% 0.02 60 / 0.14);
+  --shadow-lift:
+    0 1px 0 oklch(100% 0 0 / 0.90) inset,
+    0 22px 56px -18px oklch(25% 0.02 60 / 0.22);
 }
