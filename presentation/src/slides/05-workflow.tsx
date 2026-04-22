@@ -49,11 +49,11 @@ function WorkflowDiagram({ level }: { level: "beginner" | "intermediate" | "adva
     <div className="relative w-full h-full">
       <Canvas>
         <Node x={200} y={180} kind="agent" tone="accent" active
-              title="planner" subtitle="gemini-2.5-pro" kicker="STEP 1" />
+              title="planner" subtitle="gemini-3.1-pro" kicker="STEP 1" />
         <Node x={500} y={180} kind="agent" tone="accent"
-              title="researcher" subtitle="gemini-2.5-flash · google_search" kicker="STEP 2" />
+              title="researcher" subtitle="gemini-3.1-flash · google_search" kicker="STEP 2" />
         <Node x={800} y={180} kind="agent" tone="accent"
-              title="writer" subtitle="gemini-2.5-pro" kicker="STEP 3" />
+              title="writer" subtitle="gemini-3.1-pro" kicker="STEP 3" />
 
         <Edge from={{ x: 300, y: 180 }} to={{ x: 400, y: 180 }}
               arrow="forward" travel label="state.plan" delay={0.4} />

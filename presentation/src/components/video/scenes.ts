@@ -117,7 +117,7 @@ export const BEATS: Beat[] = [
       title: "coordinator.py",
       body: `root = LlmAgent(
   name="coordinator",
-  model="gemini-2.5-pro",
+  model="gemini-3.1-pro",
   sub_agents=[reservations, faq, cancel],
 )`,
     },

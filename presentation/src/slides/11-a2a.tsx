@@ -49,7 +49,7 @@ function A2ADiagram({ level }: { level: "beginner" | "intermediate" | "advanced"
     <Canvas>
       {/* Root agent */}
       <Node x={500} y={140} kind="agent" tone="accent" active
-            title="root coordinator" subtitle="ADK · gemini-2.5-pro" kicker="LOCAL" />
+            title="root coordinator" subtitle="ADK · gemini-3.1-pro" kicker="LOCAL" />
 
       {/* Three remote agents on three stacks */}
       <Node x={180} y={420} w={220} h={78} kind="agent" tone="trace"

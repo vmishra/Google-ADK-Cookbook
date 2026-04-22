@@ -58,7 +58,7 @@ function LoopDiagram({ level: _level }: { level: "beginner" | "intermediate" | "
       />
 
       <Node x={200} y={320} kind="agent" tone="accent" active
-            title="drafter+critic" subtitle="gemini-2.5-pro" kicker="ITER N" />
+            title="drafter+critic" subtitle="gemini-3.1-pro" kicker="ITER N" />
 
       <Node x={800} y={320} kind="io"
             title="state.draft" subtitle="persisted turn to turn"
