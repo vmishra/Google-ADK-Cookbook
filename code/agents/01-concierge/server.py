@@ -43,6 +43,7 @@ else:
 
 from concierge import root_agent  # noqa: E402
 from concierge.metrics import MetricsStore, TurnMetrics  # noqa: E402
+from concierge.introspect import introspect  # noqa: E402
 
 
 APP_NAME = "concierge"
@@ -78,6 +79,11 @@ async def health() -> dict:
 @app.get("/metrics")
 async def get_metrics() -> dict:
     return metrics.snapshot()
+
+
+@app.get("/introspect")
+async def get_introspect() -> dict:
+    return introspect(root_agent)
 
 
 @app.post("/session")

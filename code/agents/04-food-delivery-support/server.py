@@ -41,6 +41,7 @@ else:
 
 from food_delivery_support import root_agent  # noqa: E402
 from food_delivery_support.metrics import MetricsStore, TurnMetrics  # noqa: E402
+from food_delivery_support.introspect import introspect  # noqa: E402
 
 
 APP_NAME = "food-delivery-support"
@@ -73,6 +74,11 @@ async def health() -> dict:
 @app.get("/metrics")
 async def get_metrics() -> dict:
     return metrics.snapshot()
+
+
+@app.get("/introspect")
+async def get_introspect() -> dict:
+    return introspect(root_agent)
 
 
 @app.post("/session")

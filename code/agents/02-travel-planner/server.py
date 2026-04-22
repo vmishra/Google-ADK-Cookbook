@@ -33,6 +33,7 @@ else:
 
 from travel_planner import root_agent  # noqa: E402
 from travel_planner.metrics import MetricsStore, TurnMetrics  # noqa: E402
+from travel_planner.introspect import introspect  # noqa: E402
 
 
 APP_NAME = "travel-planner"
@@ -70,6 +71,11 @@ async def health() -> dict:
 @app.get("/metrics")
 async def get_metrics() -> dict:
     return metrics.snapshot()
+
+
+@app.get("/introspect")
+async def get_introspect() -> dict:
+    return introspect(root_agent)
 
 
 @app.post("/session")

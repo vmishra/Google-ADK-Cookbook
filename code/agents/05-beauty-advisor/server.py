@@ -33,6 +33,7 @@ else:
 
 from beauty_advisor import root_agent  # noqa: E402
 from beauty_advisor.metrics import MetricsStore, TurnMetrics  # noqa: E402
+from beauty_advisor.introspect import introspect  # noqa: E402
 
 
 APP_NAME = "beauty-advisor"
@@ -66,6 +67,11 @@ async def health() -> dict:
 @app.get("/metrics")
 async def get_metrics() -> dict:
     return metrics.snapshot()
+
+
+@app.get("/introspect")
+async def get_introspect() -> dict:
+    return introspect(root_agent)
 
 
 @app.get("/profile/{session_id}")
