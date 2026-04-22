@@ -19,8 +19,17 @@ from __future__ import annotations
 import os
 
 from google.adk.agents import LlmAgent, SequentialAgent
+from google.adk.planners import BuiltInPlanner
+from google.genai import types as genai_types
 
 from .sub_agents.researchers import parallel_researchers
+
+
+_LOW_THINKING = BuiltInPlanner(
+    thinking_config=genai_types.ThinkingConfig(
+        thinking_level=genai_types.ThinkingLevel.LOW,
+    ),
+)
 
 
 PRIMARY_MODEL = os.environ.get("PLANNER_MODEL", "gemini-3-flash-preview")
@@ -39,6 +48,7 @@ planner = LlmAgent(
         "If the guest omitted anything, infer a sensible default and "
         "say so in a 'notes' field. Return only the JSON — no prose."
     ),
+    planner=_LOW_THINKING,
     output_key="plan",
 )
 
@@ -69,6 +79,7 @@ composer = LlmAgent(
         "'unforgettable', 'perfect'. Tabular-aligned prices. Write "
         "the way a senior concierge writes a dossier."
     ),
+    planner=_LOW_THINKING,
     output_key="itinerary",
 )
 
