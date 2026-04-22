@@ -8,8 +8,12 @@ import { ChatPanel } from "@/components/agent/ChatPanel";
 import { VoicePanel } from "@/components/agent/VoicePanel";
 import { ComputerUsePane } from "@/components/agent/ComputerUsePane";
 import { MetricsRibbon } from "@/components/agent/MetricsRibbon";
+import { AgentArchitecture } from "@/components/agent/AgentArchitecture";
 import { fadeRise } from "@/lib/motion";
+import { cn } from "@/lib/cn";
 import { navigate } from "@/lib/router";
+
+type LeftTab = "overview" | "architecture";
 
 interface Props {
   id: string;
@@ -18,6 +22,7 @@ interface Props {
 export function AgentPage({ id }: Props) {
   const agent = findAgent(id);
   const [active, setActive] = useState(false);
+  const [leftTab, setLeftTab] = useState<LeftTab>("overview");
 
   if (!agent) {
     return (
@@ -45,10 +50,17 @@ export function AgentPage({ id }: Props) {
       <Topbar crumb={`${agent.number} · ${agent.title}`} active={active} />
       <div className="flex-1 flex overflow-hidden">
         <aside
-          className="w-[380px] shrink-0 border-r border-[var(--border)] overflow-auto"
+          className="w-[380px] shrink-0 border-r border-[var(--border)] flex flex-col min-h-0"
           style={{ background: "var(--surface-raised)" }}
         >
-          <LeftColumn agent={agent} />
+          <LeftTabs tab={leftTab} onChange={setLeftTab} />
+          <div className="flex-1 overflow-auto">
+            {leftTab === "overview" ? (
+              <LeftColumn agent={agent} />
+            ) : (
+              <AgentArchitecture baseUrl={agent.baseUrl} />
+            )}
+          </div>
         </aside>
         <main className="flex-1 flex flex-col min-w-0">
           <div className="border-b border-[var(--border)] px-5 py-3 bg-[var(--surface)]">
@@ -78,6 +90,42 @@ export function AgentPage({ id }: Props) {
           </div>
         </main>
       </div>
+    </div>
+  );
+}
+
+function LeftTabs({ tab, onChange }: { tab: LeftTab; onChange: (t: LeftTab) => void }) {
+  const tabs: { id: LeftTab; label: string }[] = [
+    { id: "overview", label: "overview" },
+    { id: "architecture", label: "architecture" },
+  ];
+  return (
+    <div
+      className="flex items-stretch px-3 border-b"
+      style={{ borderColor: "var(--border)" }}
+    >
+      {tabs.map((t) => {
+        const active = tab === t.id;
+        return (
+          <button
+            key={t.id}
+            type="button"
+            onClick={() => onChange(t.id)}
+            className={cn(
+              "relative h-11 px-3 text-[10.5px] tracking-[0.22em] uppercase font-[var(--font-mono)] font-medium transition-colors",
+              active ? "text-[var(--text)]" : "text-[var(--text-subtle)] hover:text-[var(--text-muted)]",
+            )}
+          >
+            {t.label}
+            {active && (
+              <span
+                className="absolute inset-x-2.5 bottom-0 h-[2px]"
+                style={{ background: "var(--accent)" }}
+              />
+            )}
+          </button>
+        );
+      })}
     </div>
   );
 }
