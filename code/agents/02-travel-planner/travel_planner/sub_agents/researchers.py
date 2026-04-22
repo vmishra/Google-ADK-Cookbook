@@ -10,11 +10,23 @@ from __future__ import annotations
 import os
 
 from google.adk.agents import LlmAgent, ParallelAgent
+from google.adk.planners import BuiltInPlanner
+from google.genai import types as genai_types
 
 from ..tools import search_activities, search_flights, search_hotels
 
 
 WORKER_MODEL = os.environ.get("PLANNER_WORKER_MODEL", "gemini-3.1-flash-lite-preview")
+
+
+# MINIMAL is the canonical pairing for Flash-Lite — enough thinking to
+# read the plan and pick the right tool args, no more. Matches Google's
+# own Flash-Lite samples.
+_MINIMAL_THINKING = BuiltInPlanner(
+    thinking_config=genai_types.ThinkingConfig(
+        thinking_level=genai_types.ThinkingLevel.MINIMAL,
+    ),
+)
 
 
 flight_researcher = LlmAgent(
@@ -31,6 +43,7 @@ flight_researcher = LlmAgent(
         "default to economy."
     ),
     tools=[search_flights],
+    planner=_MINIMAL_THINKING,
     output_key="flights_brief",
 )
 
@@ -47,6 +60,7 @@ hotel_researcher = LlmAgent(
         "lower cost within the same tier."
     ),
     tools=[search_hotels],
+    planner=_MINIMAL_THINKING,
     output_key="hotels_brief",
 )
 
@@ -62,6 +76,7 @@ activity_researcher = LlmAgent(
         "No adjectives like 'amazing' or 'unforgettable'."
     ),
     tools=[search_activities],
+    planner=_MINIMAL_THINKING,
     output_key="activities_brief",
 )
 
