@@ -81,9 +81,16 @@ def _run_config() -> RunConfig:
 
     - AUDIO out with transcripts surfaced on both sides.
     - Session resumption so a dropped socket can reconnect.
+    - Context-window compression so long support calls (a caller
+      narrating a dispute, an agent reading back a case history)
+      do not blow out the model's window. Triggers at ~100k tokens
+      and compresses to a ~50k sliding window, matching Google's
+      recommended defaults for the Live API.
     - A calm, measured voice. Override via env.
     """
-    voice_name = os.environ.get("VOICE_NAME", "Aoede")
+    voice_name = os.environ.get("VOICE_NAME", "Kore")
+    trigger = int(os.environ.get("LIVE_COMPRESSION_TRIGGER_TOKENS", "104857"))
+    target = int(os.environ.get("LIVE_COMPRESSION_TARGET_TOKENS", "52428"))
     return RunConfig(
         streaming_mode=StreamingMode.BIDI,
         response_modalities=["AUDIO"],
@@ -95,6 +102,10 @@ def _run_config() -> RunConfig:
         input_audio_transcription=types.AudioTranscriptionConfig(),
         output_audio_transcription=types.AudioTranscriptionConfig(),
         session_resumption=types.SessionResumptionConfig(),
+        context_window_compression=types.ContextWindowCompressionConfig(
+            trigger_tokens=trigger,
+            sliding_window=types.SlidingWindow(target_tokens=target),
+        ),
     )
 
 
