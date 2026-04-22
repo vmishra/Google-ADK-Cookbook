@@ -5,6 +5,7 @@ import { Send, Wrench, CircleDot } from "lucide-react";
 import { streamSSE } from "@/lib/sse";
 import { chipEnter, fadeRise, spring } from "@/lib/motion";
 import { Chip } from "@/components/primitives/Chip";
+import { TurnTelemetry } from "./TurnTelemetry";
 
 interface Props {
   baseUrl: string;
@@ -364,7 +365,7 @@ function UserBubble({ text }: { text: string }) {
 
 function ModelBubble({ turn, showAuthor }: { turn: Extract<Turn, { kind: "model" }>; showAuthor?: boolean }) {
   return (
-    <div className="flex flex-col gap-2 max-w-[78%]">
+    <div className="flex flex-col gap-2 max-w-[680px]">
       {showAuthor && turn.author && (
         <span className="kicker">{turn.author.replace(/_/g, " ")}</span>
       )}
@@ -390,6 +391,13 @@ function ModelBubble({ turn, showAuthor }: { turn: Extract<Turn, { kind: "model"
       )}
       {!turn.text && turn.toolCalls.length === 0 && !turn.complete && (
         <div className="text-[13px] text-[var(--text-subtle)] italic">considering…</div>
+      )}
+      {(turn.metrics || turn.toolCalls.length > 0) && (
+        <TurnTelemetry
+          metrics={turn.metrics}
+          toolCalls={turn.toolCalls}
+          inFlight={!turn.complete}
+        />
       )}
     </div>
   );
