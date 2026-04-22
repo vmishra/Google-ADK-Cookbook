@@ -30,12 +30,14 @@ from pydantic import BaseModel
 load_dotenv()
 
 from food_delivery_support import root_agent  # noqa: E402
+from food_delivery_support.metrics import MetricsStore, TurnMetrics  # noqa: E402
 
 
 APP_NAME = "food-delivery-support"
 USER_ID = "customer"
 
 runner = InMemoryRunner(agent=root_agent, app_name=APP_NAME)
+metrics = MetricsStore()
 app = FastAPI(title="Food delivery support", version="1.0.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
@@ -58,6 +60,11 @@ async def health() -> dict:
     }
 
 
+@app.get("/metrics")
+async def get_metrics() -> dict:
+    return metrics.snapshot()
+
+
 @app.post("/session")
 async def new_session() -> dict:
     session = await runner.session_service.create_session(
@@ -72,14 +79,18 @@ def _sse(payload: dict) -> str:
 
 async def _stream(session_id: str, message: str) -> AsyncIterator[str]:
     new_message = types.Content(role="user", parts=[types.Part(text=message)])
+    turn = TurnMetrics(model=root_agent.model)
     try:
         async for event in runner.run_async(
             user_id=USER_ID, session_id=session_id, new_message=new_message
         ):
+            turn.record_usage(getattr(event, "usage_metadata", None))
             for part in (event.content.parts if event.content else []):
                 if part.text:
+                    turn.mark_first_token()
                     yield _sse({"kind": "text", "data": part.text})
                 if part.function_call:
+                    turn.record_tool_call()
                     yield _sse({
                         "kind": "tool_call",
                         "name": part.function_call.name,
@@ -87,7 +98,6 @@ async def _stream(session_id: str, message: str) -> AsyncIterator[str]:
                     })
                 if part.function_response:
                     response = part.function_response.response
-                    # Screenshots come back as bytes under the 'image' key.
                     screenshot_b64 = None
                     if isinstance(response, dict):
                         for k in ("screenshot", "image"):
@@ -102,9 +112,13 @@ async def _stream(session_id: str, message: str) -> AsyncIterator[str]:
                         "data": _compact(response),
                     })
             if getattr(event, "turn_complete", False):
-                yield _sse({"kind": "turn_complete"})
+                turn.finish()
+                metrics.record(turn)
+                yield _sse({"kind": "turn_complete", "metrics": turn.as_dict()})
     except Exception as e:
-        yield _sse({"kind": "error", "data": str(e)})
+        turn.finish(error=str(e))
+        metrics.record(turn)
+        yield _sse({"kind": "error", "data": str(e), "metrics": turn.as_dict()})
 
 
 def _compact(value):

@@ -22,14 +22,25 @@ from pydantic import BaseModel
 load_dotenv()
 
 from travel_planner import root_agent  # noqa: E402
+from travel_planner.metrics import MetricsStore, TurnMetrics  # noqa: E402
 
 
 APP_NAME = "travel-planner"
 USER_ID = "guest"
 
 runner = InMemoryRunner(agent=root_agent, app_name=APP_NAME)
+metrics = MetricsStore()
 app = FastAPI(title="Travel planner", version="1.0.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+
+
+def _primary_model() -> str:
+    """Best-effort: the composer author's model, which dominates cost."""
+    for sub in getattr(root_agent, "sub_agents", []) or []:
+        model = getattr(sub, "model", None)
+        if model:
+            return model
+    return "gemini-3.1-flash"
 
 
 class ChatInput(BaseModel):
@@ -46,6 +57,11 @@ async def health() -> dict:
     }
 
 
+@app.get("/metrics")
+async def get_metrics() -> dict:
+    return metrics.snapshot()
+
+
 @app.post("/session")
 async def new_session() -> dict:
     session = await runner.session_service.create_session(
@@ -60,17 +76,20 @@ def _sse(payload: dict) -> str:
 
 async def _stream(session_id: str, message: str) -> AsyncIterator[str]:
     new_message = types.Content(role="user", parts=[types.Part(text=message)])
+    turn = TurnMetrics(model=_primary_model())
     try:
         async for event in runner.run_async(
             user_id=USER_ID, session_id=session_id, new_message=new_message
         ):
             author = event.author or ""
-            # Emit a phase-change signal whenever the author changes.
+            turn.record_usage(getattr(event, "usage_metadata", None))
             yield _sse({"kind": "author", "author": author})
             for part in (event.content.parts if event.content else []):
                 if part.text:
+                    turn.mark_first_token()
                     yield _sse({"kind": "text", "author": author, "data": part.text})
                 if part.function_call:
+                    turn.record_tool_call()
                     yield _sse({
                         "kind": "tool_call",
                         "author": author,
@@ -85,9 +104,17 @@ async def _stream(session_id: str, message: str) -> AsyncIterator[str]:
                         "data": part.function_response.response,
                     })
             if getattr(event, "turn_complete", False):
-                yield _sse({"kind": "turn_complete", "author": author})
+                turn.finish()
+                metrics.record(turn)
+                yield _sse({
+                    "kind": "turn_complete",
+                    "author": author,
+                    "metrics": turn.as_dict(),
+                })
     except Exception as e:
-        yield _sse({"kind": "error", "data": str(e)})
+        turn.finish(error=str(e))
+        metrics.record(turn)
+        yield _sse({"kind": "error", "data": str(e), "metrics": turn.as_dict()})
 
 
 @app.post("/chat/{session_id}")

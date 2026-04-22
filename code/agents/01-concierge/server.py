@@ -29,12 +29,14 @@ from pydantic import BaseModel
 load_dotenv()  # reads .env in the working dir before the agent imports
 
 from concierge import root_agent  # noqa: E402
+from concierge.metrics import MetricsStore, TurnMetrics  # noqa: E402
 
 
 APP_NAME = "concierge"
 USER_ID = "guest"
 
 runner = InMemoryRunner(agent=root_agent, app_name=APP_NAME)
+metrics = MetricsStore()
 
 app = FastAPI(title="Concierge", version="1.0.0")
 
@@ -60,6 +62,11 @@ async def health() -> dict:
     }
 
 
+@app.get("/metrics")
+async def get_metrics() -> dict:
+    return metrics.snapshot()
+
+
 @app.post("/session")
 async def new_session() -> dict:
     session = await runner.session_service.create_session(
@@ -81,14 +88,18 @@ async def _stream(session_id: str, message: str) -> AsyncIterator[str]:
       {"kind": "error",         "data": "..."}
     """
     new_message = types.Content(role="user", parts=[types.Part(text=message)])
+    turn = TurnMetrics(model=root_agent.model)
     try:
         async for event in runner.run_async(
             user_id=USER_ID, session_id=session_id, new_message=new_message
         ):
+            turn.record_usage(getattr(event, "usage_metadata", None))
             for part in (event.content.parts if event.content else []):
                 if part.text:
+                    turn.mark_first_token()
                     yield _sse({"kind": "text", "data": part.text})
                 if part.function_call:
+                    turn.record_tool_call()
                     yield _sse({
                         "kind": "tool_call",
                         "name": part.function_call.name,
@@ -101,9 +112,13 @@ async def _stream(session_id: str, message: str) -> AsyncIterator[str]:
                         "data": part.function_response.response,
                     })
             if getattr(event, "turn_complete", False):
-                yield _sse({"kind": "turn_complete"})
+                turn.finish()
+                metrics.record(turn)
+                yield _sse({"kind": "turn_complete", "metrics": turn.as_dict()})
     except Exception as e:  # surface a calm error to the client
-        yield _sse({"kind": "error", "data": str(e)})
+        turn.finish(error=str(e))
+        metrics.record(turn)
+        yield _sse({"kind": "error", "data": str(e), "metrics": turn.as_dict()})
 
 
 def _sse(payload: dict) -> str:

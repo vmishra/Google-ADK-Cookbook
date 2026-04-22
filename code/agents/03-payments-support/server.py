@@ -39,12 +39,14 @@ from google.genai import types
 load_dotenv()
 
 from payments_support import root_agent  # noqa: E402
+from payments_support.metrics import MetricsStore, TurnMetrics  # noqa: E402
 
 
 APP_NAME = "payments-voice"
 USER_ID = "caller"
 
 runner = InMemoryRunner(agent=root_agent, app_name=APP_NAME)
+metrics = MetricsStore()
 app = FastAPI(title="Payments voice support", version="1.0.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
@@ -57,6 +59,11 @@ async def health() -> dict:
         "model": root_agent.model,
         "modality": "voice (bidirectional)",
     }
+
+
+@app.get("/metrics")
+async def get_metrics() -> dict:
+    return metrics.snapshot()
 
 
 def _run_config() -> RunConfig:
@@ -108,6 +115,7 @@ async def _forward_model_to_browser(
     ws: WebSocket, session_id: str, queue: LiveRequestQueue
 ) -> None:
     """Read events from run_live, render them to the portal."""
+    turn = TurnMetrics(model=root_agent.model)
     try:
         async for event in runner.run_live(
             user_id=USER_ID,
@@ -115,19 +123,23 @@ async def _forward_model_to_browser(
             live_request_queue=queue,
             run_config=_run_config(),
         ):
+            turn.record_usage(getattr(event, "usage_metadata", None))
             for part in (event.content.parts if event.content else []):
                 if part.inline_data and part.inline_data.data:
+                    turn.mark_first_token()
                     await ws.send_json({
                         "kind": "audio",
                         "data": base64.b64encode(part.inline_data.data).decode(),
                     })
                 if part.text:
+                    turn.mark_first_token()
                     await ws.send_json({
                         "kind": "transcript",
                         "role": event.content.role or "model",
                         "data": part.text,
                     })
                 if part.function_call:
+                    turn.record_tool_call()
                     await ws.send_json({
                         "kind": "tool_call",
                         "name": part.function_call.name,
@@ -140,7 +152,14 @@ async def _forward_model_to_browser(
                         "data": _jsonable(part.function_response.response),
                     })
             if getattr(event, "turn_complete", False):
-                await ws.send_json({"kind": "turn_complete"})
+                turn.finish()
+                metrics.record(turn)
+                await ws.send_json({
+                    "kind": "turn_complete",
+                    "metrics": turn.as_dict(),
+                })
+                # Next turn in the same live session gets its own metric.
+                turn = TurnMetrics(model=root_agent.model)
     except WebSocketDisconnect:
         return
 
