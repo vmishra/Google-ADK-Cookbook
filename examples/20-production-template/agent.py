@@ -20,7 +20,7 @@ def lookup_user(user_id: str, tool_context: ToolContext) -> dict:
 
 root_agent = LlmAgent(
     name="production_agent",
-    model="gemini-2.5-flash",
+    model="gemini-3.1-flash",
     description="Production template.",
     instruction=(
         "You are a production agent. Call lookup_user when needed. "

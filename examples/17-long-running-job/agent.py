@@ -34,7 +34,7 @@ def issue_refund(order_id: str, amount_cents: int) -> dict:
 
 root_agent = LlmAgent(
     name="refunds",
-    model="gemini-2.5-flash",
+    model="gemini-3.1-flash",
     description="Handles refund requests with human approval.",
     instruction=(
         "When a user asks for a refund, first call ask_for_approval "

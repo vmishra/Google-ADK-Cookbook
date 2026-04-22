@@ -14,7 +14,7 @@ def stop_if_approved(cc: CallbackContext):
 
 drafter_and_critic = LlmAgent(
     name="drafter_and_critic",
-    model="gemini-2.5-pro",
+    model="gemini-3.1-pro",
     instruction=(
         "You maintain state['draft'] and state['critique_passed']. "
         "Step 1: if state['draft'] is empty, write a first draft. "

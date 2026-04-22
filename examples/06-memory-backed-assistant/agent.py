@@ -23,7 +23,7 @@ def _memory_service():
 
 root_agent = LlmAgent(
     name="personal_assistant",
-    model="gemini-2.5-flash",
+    model="gemini-3.1-flash",
     instruction=(
         "You are a concise personal assistant. "
         "When the user mentions a preference (diet, hobbies, schedule), "

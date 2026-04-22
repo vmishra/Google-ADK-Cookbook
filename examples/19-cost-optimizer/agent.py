@@ -28,7 +28,7 @@ def after_tool(tool, args, ctx, result):
 
 fast = LlmAgent(
     name="fast",
-    model="gemini-2.5-flash",
+    model="gemini-3.1-flash",
     instruction=(
         "Answer the user. If you are less than 75% confident, write "
         "state['confidence']=0 (else 1) and keep your answer short."),
@@ -43,7 +43,7 @@ fast = LlmAgent(
 
 fallback = LlmAgent(
     name="fallback",
-    model="gemini-2.5-pro",
+    model="gemini-3.1-pro",
     instruction=(
         "The fast model was not confident. Using state['fast_answer'] "
         "as a starting point, produce a better answer."),

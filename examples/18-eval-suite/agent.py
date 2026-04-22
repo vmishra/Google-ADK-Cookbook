@@ -18,7 +18,7 @@ def mark_paid(invoice_id: str, tool_context: ToolContext) -> dict:
 
 root_agent = LlmAgent(
     name="support",
-    model="gemini-2.5-flash",
+    model="gemini-3.1-flash",
     description="Support agent for demo eval.",
     instruction="Use lookup_order for status; mark_paid needs admin.",
     tools=[lookup_order, mark_paid],

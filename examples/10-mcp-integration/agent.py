@@ -15,7 +15,7 @@ NOTION_HEADERS = json.dumps({
 
 root_agent = LlmAgent(
     name="notion_agent",
-    model="gemini-2.5-flash",
+    model="gemini-3.1-flash",
     description="Reads and writes to your Notion workspace.",
     instruction=(
         "You help manage the user's Notion workspace. "

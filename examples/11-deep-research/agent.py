@@ -12,21 +12,21 @@ class Plan(BaseModel):
 
 
 planner = LlmAgent(
-    name="planner", model="gemini-2.5-pro",
+    name="planner", model="gemini-3.1-pro",
     instruction=(
         "Break the user's question into 3-6 specific, search-engine-able "
         "steps. Prefer recent sources."),
     output_schema=Plan, output_key="plan")
 
 web_researcher = LlmAgent(
-    name="web_researcher", model="gemini-2.5-flash",
+    name="web_researcher", model="gemini-3.1-flash",
     instruction=(
         "Execute each step in state['plan'].steps using google_search. "
         "Write 3-5 bullets per step to state['web_notes']."),
     tools=[google_search], output_key="web_notes")
 
 memory_researcher = LlmAgent(
-    name="memory_researcher", model="gemini-2.5-flash",
+    name="memory_researcher", model="gemini-3.1-flash",
     instruction=(
         "Search long-term memory for prior findings on the same topic. "
         "Write to state['mem_notes']. Skip if nothing relevant."),
@@ -42,7 +42,7 @@ def stop_if_enough(cc: CallbackContext):
 
 
 synthesiser = LlmAgent(
-    name="synthesiser", model="gemini-2.5-pro",
+    name="synthesiser", model="gemini-3.1-pro",
     instruction=(
         "Given state['plan'], state['web_notes'], state['mem_notes'], "
         "rate coverage 0-1 in state['coverage_score']. Below 0.8, revise "
@@ -57,7 +57,7 @@ loop = LoopAgent(
     max_iterations=3)
 
 writer = LlmAgent(
-    name="writer", model="gemini-2.5-pro",
+    name="writer", model="gemini-3.1-pro",
     instruction=(
         "Write a 400-word report answering the user question using "
         "state['web_notes'] and state['mem_notes']. Cite inline as [n]. "
