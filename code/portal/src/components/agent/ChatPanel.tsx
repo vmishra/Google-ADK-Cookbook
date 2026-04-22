@@ -22,7 +22,8 @@ type Turn =
       toolCalls: { name: string; args: any }[];
       author?: string;
       complete: boolean;
-    };
+    }
+  | { kind: "error"; text: string };
 
 export function ChatPanel({ baseUrl, prompts, onTurn, onActive, showAuthor }: Props) {
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -130,7 +131,7 @@ export function ChatPanel({ baseUrl, prompts, onTurn, onActive, showAuthor }: Pr
         } else if (evt.kind === "error") {
           setTurns((arr) => [
             ...arr,
-            { kind: "model", text: `[agent error] ${evt.data}`, toolCalls: [], complete: true },
+            { kind: "error", text: formatAgentError(evt.data) },
           ]);
         }
       }
@@ -138,7 +139,7 @@ export function ChatPanel({ baseUrl, prompts, onTurn, onActive, showAuthor }: Pr
       if (e.name !== "AbortError") {
         setTurns((arr) => [
           ...arr,
-          { kind: "model", text: `[stream error] ${e.message}`, toolCalls: [], complete: true },
+          { kind: "error", text: `Stream dropped — ${e.message}` },
         ]);
       }
     } finally {
@@ -214,6 +215,8 @@ export function ChatPanel({ baseUrl, prompts, onTurn, onActive, showAuthor }: Pr
               >
                 {t.kind === "user" ? (
                   <UserBubble text={t.text} />
+                ) : t.kind === "error" ? (
+                  <ErrorBubble text={t.text} />
                 ) : (
                   <ModelBubble turn={t} showAuthor={showAuthor} />
                 )}
@@ -319,6 +322,53 @@ function ModelBubble({ turn, showAuthor }: { turn: Extract<Turn, { kind: "model"
       )}
     </div>
   );
+}
+
+function ErrorBubble({ text }: { text: string }) {
+  return (
+    <div
+      className="flex gap-3 items-start px-4 py-3 rounded-[var(--radius-md)] border"
+      style={{
+        background: "color-mix(in oklab, var(--danger) 8%, transparent)",
+        borderColor: "color-mix(in oklab, var(--danger) 40%, transparent)",
+      }}
+      role="alert"
+    >
+      <span
+        className="mt-[6px] h-[6px] w-[6px] shrink-0 rounded-full"
+        style={{ background: "var(--danger)" }}
+        aria-hidden
+      />
+      <div className="min-w-0">
+        <div className="kicker mb-1" style={{ color: "var(--danger)" }}>
+          agent error
+        </div>
+        <p className="text-[13.5px] leading-[1.6] text-[var(--text)] whitespace-pre-wrap break-words">
+          {text}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/** Soften a raw upstream error into something a reader can act on. */
+function formatAgentError(raw: string): string {
+  if (/404.*NOT_FOUND/i.test(raw) && /models\//.test(raw)) {
+    return (
+      "The agent is running against a model that isn't available on " +
+      "your API key or project. Check the model id in the agent's " +
+      ".env and restart the server, or verify your project has access " +
+      "to the preview model. Raw: " + raw
+    );
+  }
+  if (/api key/i.test(raw)) {
+    return (
+      "No API key reached the server. Either set GOOGLE_API_KEY in the " +
+      "agent's .env or export it in the shell before starting the " +
+      "server. Raw: " + raw
+    );
+  }
+  return raw;
 }
 
 function truncate(s: string, n: number): string {

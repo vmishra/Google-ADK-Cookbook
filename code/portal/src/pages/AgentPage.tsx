@@ -42,14 +42,17 @@ export function AgentPage({ id }: Props) {
   }
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="h-screen flex flex-col bg-[var(--surface)]">
       <Topbar crumb={`${agent.number} · ${agent.title}`} active={active} />
       <div className="flex-1 flex overflow-hidden">
-        <aside className="w-[380px] shrink-0 border-r border-[var(--border)] overflow-auto">
+        <aside
+          className="w-[380px] shrink-0 border-r border-[var(--border)] overflow-auto"
+          style={{ background: "var(--surface-raised)" }}
+        >
           <LeftColumn agent={agent} />
         </aside>
         <main className="flex-1 flex flex-col min-w-0">
-          <div className="border-b border-[var(--border)] px-5 py-3">
+          <div className="border-b border-[var(--border)] px-5 py-3 bg-[var(--surface)]">
             <MetricsRibbon baseUrl={agent.baseUrl} lastTurn={lastTurn} />
           </div>
           <div className="flex-1 min-h-0">
@@ -96,7 +99,14 @@ function LeftColumn({ agent }: { agent: ReturnType<typeof findAgent> & {} }) {
         <h1 className="font-[var(--font-serif)] text-[44px] leading-[1.04] font-medium tracking-[-0.02em]">
           {agent.title}
         </h1>
-        <p className="font-[var(--font-serif)] italic text-[16px] text-[var(--text-muted)] mt-3 leading-[1.55]">
+        <motion.div
+          className="hairline mt-5"
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ duration: 1.1, ease: [0.2, 0.7, 0.2, 1], delay: 0.15 }}
+          style={{ width: 140, transformOrigin: "left" }}
+        />
+        <p className="font-[var(--font-serif)] italic text-[16px] text-[var(--text-muted)] mt-4 leading-[1.55]">
           {agent.subtitle}
         </p>
       </div>
