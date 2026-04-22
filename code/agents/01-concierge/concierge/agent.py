@@ -9,6 +9,8 @@ from __future__ import annotations
 import os
 
 from google.adk.agents import LlmAgent
+from google.adk.planners import BuiltInPlanner
+from google.genai import types as genai_types
 
 from .tools import (
     book_restaurant,
@@ -68,6 +70,15 @@ root_agent = LlmAgent(
         "amenities, local suggestions. Holds and confirmations are 48h."
     ),
     instruction=INSTRUCTION,
+    # LOW thinking — enough chain-of-thought to decide which tool and
+    # sequence correctly for a guest turn, but not the cost/latency of
+    # HIGH which is reserved for the travel planner's composer and the
+    # beauty advisor's root.
+    planner=BuiltInPlanner(
+        thinking_config=genai_types.ThinkingConfig(
+            thinking_level=genai_types.ThinkingLevel.LOW,
+        ),
+    ),
     tools=[
         list_rooms,
         check_availability,
