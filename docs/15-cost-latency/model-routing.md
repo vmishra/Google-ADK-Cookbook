@@ -11,9 +11,9 @@ between tiers when it pays off.
 
 | Model | Strength | Typical use |
 |---|---|---|
-| `gemini-2.5-flash` | Fast, cheap, good at tool calling | Default for every agent |
-| `gemini-2.5-pro` | Reasoning, instruction following | Planning, synthesis, final write |
-| `gemini-2.5-flash-lite` (where available) | Lowest cost | Classifiers, simple routers |
+| `gemini-3.1-flash` | Fast, cheap, good at tool calling | Default for every agent |
+| `gemini-3.1-pro` | Reasoning, instruction following | Planning, synthesis, final write |
+| `gemini-3.1-flash-lite` (where available) | Lowest cost | Classifiers, simple routers |
 | `gemini-live-2.5-flash-native-audio` | Audio in/out | Voice agents |
 | `gemini-2.5-computer-use-preview-10-2025` | Browser operation | Computer use |
 
@@ -22,9 +22,9 @@ between tiers when it pays off.
 In a sequential workflow:
 
 ```python
-planner    = LlmAgent(model="gemini-2.5-pro",   ...)
-researcher = LlmAgent(model="gemini-2.5-flash", ...)
-writer     = LlmAgent(model="gemini-2.5-pro",   ...)
+planner    = LlmAgent(model="gemini-3.1-pro",   ...)
+researcher = LlmAgent(model="gemini-3.1-flash", ...)
+writer     = LlmAgent(model="gemini-3.1-pro",   ...)
 ```
 
 Planning and writing benefit from Pro; searching is Flash. Cost

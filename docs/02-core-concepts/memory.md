@@ -65,11 +65,11 @@ from google.adk.tools.load_memory_tool import load_memory_tool
 from google.adk.tools.preload_memory_tool import preload_memory_tool
 
 # On-demand — the model decides when to search.
-agent = LlmAgent(model="gemini-2.5-flash", tools=[load_memory_tool])
+agent = LlmAgent(model="gemini-3.1-flash", tools=[load_memory_tool])
 
 # Eager — the runtime searches at the start of every turn and
 # injects the results into the prompt.
-agent = LlmAgent(model="gemini-2.5-flash", tools=[preload_memory_tool])
+agent = LlmAgent(model="gemini-3.1-flash", tools=[preload_memory_tool])
 ```
 
 Pick eager if the agent is heavily memory-dependent (e.g. a
@@ -87,7 +87,7 @@ async def auto_save_callback(cc):
         cc._invocation_context.session)
 
 root = LlmAgent(
-    model="gemini-2.5-flash",
+    model="gemini-3.1-flash",
     tools=[preload_memory_tool],
     after_agent_callback=auto_save_callback,
 )

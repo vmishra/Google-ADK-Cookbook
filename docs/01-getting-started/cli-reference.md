@@ -38,7 +38,7 @@ Flags worth knowing:
 - `--replay <path>` — replay a saved session against the agent.
 - `--resume <session_file>` — continue a saved session.
 - `--model <override>` — override the agent's model for a run.
-  Useful for "would this still work on `gemini-2.5-pro`?".
+  Useful for "would this still work on `gemini-3.1-pro`?".
 
 ## `adk web`
 
@@ -143,7 +143,7 @@ can be edited by people who do not write Python. Experimental in
 # agent_config.yaml
 agent:
   name: support
-  model: gemini-2.5-flash
+  model: gemini-3.1-flash
   instruction: |
     You are a concise customer support agent.
   tools:

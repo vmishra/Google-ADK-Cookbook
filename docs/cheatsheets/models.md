@@ -2,9 +2,9 @@
 
 | Model | Strength | Typical cost profile | Use for |
 |---|---|---|---|
-| `gemini-2.5-flash` | Fast, cheap, solid tool calling | lowest | Default |
-| `gemini-2.5-pro` | Reasoning, instruction following | medium-high | Planning, synthesis |
-| `gemini-2.5-flash-lite` | Minimal, classification | very low | Classifiers, routers |
+| `gemini-3.1-flash` | Fast, cheap, solid tool calling | lowest | Default |
+| `gemini-3.1-pro` | Reasoning, instruction following | medium-high | Planning, synthesis |
+| `gemini-3.1-flash-lite` | Minimal, classification | very low | Classifiers, routers |
 | `gemini-live-2.5-flash-native-audio` | Bidi audio (Vertex) | medium | Voice agents |
 | `gemini-2.5-flash-native-audio-preview-12-2025` | Bidi audio (Gemini API) | medium | Voice agents on the API path |
 | `gemini-2.5-computer-use-preview-10-2025` | Browser operation | medium-high | Computer use |

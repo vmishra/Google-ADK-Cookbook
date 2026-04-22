@@ -47,7 +47,7 @@ sre = RemoteA2aAgent(
 
 root = LlmAgent(
     name="root",
-    model="gemini-2.5-flash",
+    model="gemini-3.1-flash",
     sub_agents=[sre, other_local_agent],
     instruction="Transfer SRE questions to sre; handle everything else.",
 )

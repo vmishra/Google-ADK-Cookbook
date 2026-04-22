@@ -86,7 +86,7 @@ billing = OpenApiTool(
     auth_scheme="api_key",      # or "oauth2", "bearer", "none"
     api_key_env="BILLING_KEY",
 )
-root_agent = LlmAgent(name="root", model="gemini-2.5-flash",
+root_agent = LlmAgent(name="root", model="gemini-3.1-flash",
                      tools=[billing])
 ```
 
@@ -108,7 +108,7 @@ notion = MCPToolset(connection_params=StdioServerParameters(
     args=["-y", "@notionhq/notion-mcp-server"],
     env={"OPENAPI_MCP_HEADERS": notion_headers}))
 
-root_agent = LlmAgent(name="notion_agent", model="gemini-2.5-flash",
+root_agent = LlmAgent(name="notion_agent", model="gemini-3.1-flash",
                      tools=[notion])
 ```
 
@@ -126,7 +126,7 @@ hierarchical control without the LLM-delegation semantics of
 from google.adk.tools.agent_tool import AgentTool
 
 translator_tool = AgentTool(agent=translator_agent)
-root = LlmAgent(name="root", model="gemini-2.5-flash",
+root = LlmAgent(name="root", model="gemini-3.1-flash",
                tools=[translator_tool])
 ```
 
@@ -149,7 +149,7 @@ def ask_for_approval(amount: float, reason: str) -> dict:
     ...
 
 root = LlmAgent(
-    name="reimbursements", model="gemini-2.5-flash",
+    name="reimbursements", model="gemini-3.1-flash",
     tools=[reimburse, LongRunningFunctionTool(func=ask_for_approval)],
 )
 ```

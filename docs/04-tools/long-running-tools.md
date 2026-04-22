@@ -29,7 +29,7 @@ def ask_for_approval(amount: float, reason: str) -> dict:
 
 root_agent = LlmAgent(
     name="reimbursements",
-    model="gemini-2.5-flash",
+    model="gemini-3.1-flash",
     tools=[reimburse, LongRunningFunctionTool(func=ask_for_approval)],
 )
 ```
@@ -88,7 +88,7 @@ confirmation arrives. Best for interactive dev UIs.
 from google.adk.tools.human_tool_confirmation import HumanToolConfirmation
 
 root_agent = LlmAgent(
-    name="safe_ops", model="gemini-2.5-flash",
+    name="safe_ops", model="gemini-3.1-flash",
     tools=[HumanToolConfirmation(wraps=delete_account)],
 )
 ```

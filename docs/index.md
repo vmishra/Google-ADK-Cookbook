@@ -139,8 +139,8 @@ Three passes, by depth:
 | Layer | Version | Notes |
 |---|---|---|
 | ADK Python | 1.31.1 | Released 2026-04-21. |
-| Gemini default | `gemini-2.5-flash` | The cost–latency balance most chapters want. |
-| Gemini reasoning | `gemini-2.5-pro` | Deep research, planning, hard tool-use. |
+| Gemini default | `gemini-3.1-flash` | The cost–latency balance most chapters want. |
+| Gemini reasoning | `gemini-3.1-pro` | Deep research, planning, hard tool-use. |
 | Gemini computer-use | `gemini-2.5-computer-use-preview-10-2025` | Preview. Chapter 7. |
 | Gemini live (Vertex) | `gemini-live-2.5-flash-native-audio` | Chapter 6. |
 | Gemini live (API) | `gemini-2.5-flash-native-audio-preview-12-2025` | Chapter 6. |

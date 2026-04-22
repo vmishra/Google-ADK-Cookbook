@@ -69,7 +69,7 @@ weather = load_skill_from_dir("./skills/weather")
 
 root_agent = LlmAgent(
     name="assistant",
-    model="gemini-2.5-pro",
+    model="gemini-3.1-pro",
     tools=[SkillToolset(skills=[weather])],
 )
 ```

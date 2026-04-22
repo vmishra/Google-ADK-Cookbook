@@ -14,7 +14,7 @@ from google.genai import types
 from google.adk.agents import LlmAgent
 
 root_agent = LlmAgent(
-    name="root", model="gemini-2.5-flash",
+    name="root", model="gemini-3.1-flash",
     generate_content_config=types.GenerateContentConfig(
         safety_settings=[
             types.SafetySetting(

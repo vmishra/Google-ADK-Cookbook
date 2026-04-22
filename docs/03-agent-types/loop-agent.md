@@ -34,7 +34,7 @@ def stop_if_approved(cc: CallbackContext):
 
 drafter_and_critic = LlmAgent(
     name="drafter_and_critic",
-    model="gemini-2.5-pro",
+    model="gemini-3.1-pro",
     instruction=(
         "You maintain state['draft'] and state['critique_passed'] (bool). "
         "Step 1: if state['draft'] is empty, write an initial draft. "
@@ -82,8 +82,8 @@ sequenceDiagram
 - **Use a small, fast model for the critic if you split.** Splitting
   drafter and critic is often clearer than combining them:
   ```python
-  drafter = LlmAgent(name="drafter", model="gemini-2.5-pro", ...)
-  critic  = LlmAgent(name="critic",  model="gemini-2.5-flash", ...)
+  drafter = LlmAgent(name="drafter", model="gemini-3.1-pro", ...)
+  critic  = LlmAgent(name="critic",  model="gemini-3.1-flash", ...)
   pair    = SequentialAgent(sub_agents=[drafter, critic])
   root    = LoopAgent(sub_agent=pair, max_iterations=4)
   ```

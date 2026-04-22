@@ -20,7 +20,7 @@ billing = OpenApiTool(
 
 root_agent = LlmAgent(
     name="ops",
-    model="gemini-2.5-flash",
+    model="gemini-3.1-flash",
     tools=[billing],
     instruction="Use billing API to answer invoice questions.",
 )

@@ -64,7 +64,7 @@ def remember_city(city: str, tool_context: ToolContext) -> str:
 
 root_agent = LlmAgent(
     name="weather_agent",
-    model="gemini-2.5-flash",
+    model="gemini-3.1-flash",
     description="A concise weather assistant with a memory for cities.",
     instruction=(
         "You answer weather questions briefly. "

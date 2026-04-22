@@ -39,7 +39,7 @@ def mark_paid(invoice_id: str, tool_context: ToolContext) -> dict:
 
 root_agent = LlmAgent(
     name="billing",
-    model="gemini-2.5-flash",
+    model="gemini-3.1-flash",
     description="Looks up invoices and explains their status briefly.",
     instruction=(
         "You help users understand their invoices. "

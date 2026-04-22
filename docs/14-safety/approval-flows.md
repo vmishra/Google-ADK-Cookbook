@@ -51,7 +51,7 @@ def request_approval(description: str, impact: str,
 
 root_agent = LlmAgent(
     name="ops",
-    model="gemini-2.5-flash",
+    model="gemini-3.1-flash",
     instruction=(
         "Before taking any action that spends money, deletes data, "
         "or touches more than one user, call request_approval with a "
