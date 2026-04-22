@@ -6,6 +6,7 @@ import { streamSSE } from "@/lib/sse";
 import { chipEnter, fadeRise, spring } from "@/lib/motion";
 import { Chip } from "@/components/primitives/Chip";
 import { TurnTelemetry } from "./TurnTelemetry";
+import { ModelResponse } from "./ModelResponse";
 
 interface Props {
   baseUrl: string;
@@ -383,10 +384,8 @@ function ModelBubble({ turn, showAuthor }: { turn: Extract<Turn, { kind: "model"
         <motion.div
           initial={{ opacity: 0.3 }}
           animate={{ opacity: 1, transition: spring }}
-          className="text-[14px] leading-[1.6] whitespace-pre-wrap"
         >
-          {turn.text}
-          {!turn.complete && <span className="opacity-50 ml-0.5">…</span>}
+          <ModelResponse text={turn.text} streaming={!turn.complete} />
         </motion.div>
       )}
       {!turn.text && turn.toolCalls.length === 0 && !turn.complete && (
