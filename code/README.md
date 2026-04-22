@@ -88,7 +88,7 @@ page surfaces a calm *"agent is offline"* state rather than an error.
 ## Run everything at once
 
 ```bash
-./scripts/dev-all.sh
+./scripts/workshop-up.sh
 ```
 
 Starts the four agent servers and the portal in one shot. Each process
