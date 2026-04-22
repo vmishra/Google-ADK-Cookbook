@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Merchant ops console</title>
+    <style>
+      :root {
+        --surface: oklch(14% 0.010 260);
+        --elev-1: oklch(19% 0.012 260);
+        --elev-2: oklch(23% 0.014 260);
+        --border: oklch(28% 0.012 260);
+        --text: oklch(96% 0 0);
+        --text-muted: oklch(68% 0.010 260);
+        --accent: oklch(80% 0.130 85);
+        --success: oklch(72% 0.110 160);
+        --danger: oklch(68% 0.150 25);
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; padding: 24px;
+        background: var(--surface); color: var(--text);
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        font-feature-settings: "cv11";
+      }
+      header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px; }
+      header h1 { font-size: 16px; font-weight: 600; margin: 0; letter-spacing: 0.02em; }
+      header .kicker {
+        font-family: ui-monospace, monospace;
+        font-size: 10.5px; letter-spacing: 0.28em; text-transform: uppercase;
+        color: var(--text-muted);
+      }
+      .layout { display: grid; grid-template-columns: 320px 1fr; gap: 12px; height: calc(100vh - 80px); }
+      .orders, .detail {
+        background: var(--elev-1);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 20px;
+        overflow: auto;
+      }
+      .orders h2, .detail h2 {
+        font-size: 12px; font-weight: 500; color: var(--text-muted);
+        letter-spacing: 0.28em; text-transform: uppercase;
+        margin: 0 0 12px;
+        font-family: ui-monospace, monospace;
+      }
+      .order {
+        padding: 12px; border: 1px solid var(--border); border-radius: 12px;
+        margin-bottom: 8px; cursor: pointer;
+        transition: background-color 150ms;
+      }
+      .order:hover { background: var(--elev-2); }
+      .order.active { background: var(--elev-2); border-color: var(--accent); }
+      .order .id { font-family: ui-monospace, monospace; font-size: 13px; font-weight: 500; }
+      .order .meta { color: var(--text-muted); font-size: 12px; margin-top: 4px; }
+      .status {
+        display: inline-block;
+        padding: 2px 8px; border-radius: 999px;
+        font-size: 10.5px; font-family: ui-monospace, monospace;
+        letter-spacing: 0.08em; text-transform: uppercase;
+        border: 1px solid var(--border);
+        color: var(--text-muted);
+      }
+      .status.ok { color: var(--success); border-color: var(--success); }
+      .status.warn { color: var(--accent); border-color: var(--accent); }
+      .status.bad { color: var(--danger); border-color: var(--danger); }
+      .row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); }
+      .row:last-child { border-bottom: none; }
+      .row .k { color: var(--text-muted); }
+      .row .v { font-family: ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+      .items { margin-top: 12px; }
+      .actions { margin-top: 20px; display: flex; gap: 8px; flex-wrap: wrap; }
+      button {
+        padding: 8px 14px; border-radius: 999px;
+        border: 1px solid var(--border); background: var(--elev-1);
+        color: var(--text);
+        font-family: inherit; font-size: 13px; font-weight: 500;
+        cursor: pointer;
+        transition: background-color 150ms, border-color 150ms;
+      }
+      button:hover { background: var(--elev-2); border-color: oklch(36% 0.014 260); }
+      button.primary { background: var(--accent); color: oklch(16% 0 0); border-color: var(--accent); }
+      button.primary:hover { filter: brightness(1.04); }
+      .empty { color: var(--text-muted); font-style: italic; margin-top: 20px; }
+      dialog {
+        background: var(--elev-1); color: var(--text);
+        border: 1px solid var(--border); border-radius: 16px;
+        padding: 24px; width: 420px;
+      }
+      dialog::backdrop { background: oklch(0% 0 0 / 0.6); }
+      dialog input, dialog textarea {
+        width: 100%; padding: 10px 12px;
+        background: oklch(17% 0.012 260); color: var(--text);
+        border: 1px solid var(--border); border-radius: 8px;
+        font-family: inherit; font-size: 14px; margin-bottom: 12px;
+      }
+      dialog label { display: block; font-size: 11px; color: var(--text-muted); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 6px; font-family: ui-monospace, monospace; }
+      .hairline { height: 1px; background: linear-gradient(90deg, transparent, oklch(80% 0.13 85 / 0.55) 20%, oklch(80% 0.13 85 / 0.55) 80%, transparent); margin: 16px 0; }
+      #toast { position: fixed; bottom: 24px; right: 24px; padding: 14px 18px; border-radius: 12px; background: var(--elev-2); border: 1px solid var(--border); font-size: 13px; display: none; }
+      #toast.show { display: block; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Merchant ops console</h1>
+      <span class="kicker">workshop · mock</span>
+    </header>
+    <div class="layout">
+      <section class="orders">
+        <h2>Active orders</h2>
+        <div id="order-list"></div>
+      </section>
+      <section class="detail">
+        <h2>Order detail</h2>
+        <div id="detail-body" class="empty">Select an order to see its detail.</div>
+      </section>
+    </div>
+
+    <dialog id="refund-dialog">
+      <h2>Issue refund</h2>
+      <label>order id</label>
+      <input id="refund-order" readonly />
+      <label>amount (inr)</label>
+      <input id="refund-amount" type="number" step="1" />
+      <label>reason</label>
+      <textarea id="refund-reason" rows="3"></textarea>
+      <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px">
+        <button id="refund-cancel">Cancel</button>
+        <button id="refund-confirm" class="primary">Approve and proceed</button>
+      </div>
+    </dialog>
+
+    <div id="toast"></div>
+
+    <script>
+      const state = {
+        orders: [
+          { id: "FD-71023", customer: "A. Rao", merchant: "Dilli 6 Kitchen", placed: "16 min ago", status: "in_transit", subtotal: 820, items: [ {n:"Butter chicken", q:1, p:420}, {n:"Garlic naan", q:2, p:60}, {n:"Dal makhani", q:1, p:340} ], driver: "Arjun · +91 98765 43210" },
+          { id: "FD-71045", customer: "P. Shah", merchant: "Karim's Legacy", placed: "32 min ago", status: "delayed", subtotal: 1340, items: [ {n:"Mutton biryani", q:1, p:720}, {n:"Sheermal", q:2, p:120}, {n:"Phirni", q:1, p:260} ], driver: null },
+          { id: "FD-71078", customer: "V. Mehta", merchant: "Biryani Blues", placed: "8 min ago", status: "cooking", subtotal: 540, items: [ {n:"Hyderabadi biryani", q:1, p:540} ], driver: null },
+          { id: "FD-71099", customer: "K. Iyer", merchant: "Southern Spice", placed: "42 min ago", status: "delivered", subtotal: 680, items: [ {n:"Ghee dosa", q:2, p:240}, {n:"Filter coffee", q:2, p:100} ], driver: "Priya" },
+        ],
+        selected: null,
+      };
+
+      const statusClass = (s) => s === "delivered" ? "ok" : (s === "delayed" ? "bad" : "warn");
+
+      function renderList() {
+        const el = document.getElementById("order-list");
+        el.innerHTML = state.orders.map(o => `
+          <div class="order ${state.selected === o.id ? 'active' : ''}" data-id="${o.id}" id="order-${o.id}">
+            <div class="id">${o.id}</div>
+            <div class="meta">${o.customer} · ${o.merchant}</div>
+            <div class="meta">${o.placed} · <span class="status ${statusClass(o.status)}">${o.status.replace('_',' ')}</span></div>
+          </div>
+        `).join("");
+        el.querySelectorAll(".order").forEach(el =>
+          el.addEventListener("click", () => select(el.dataset.id))
+        );
+      }
+
+      function renderDetail() {
+        const el = document.getElementById("detail-body");
+        if (!state.selected) {
+          el.className = "empty";
+          el.textContent = "Select an order to see its detail.";
+          return;
+        }
+        el.className = "";
+        const o = state.orders.find(x => x.id === state.selected);
+        el.innerHTML = `
+          <div class="row"><span class="k">Order</span><span class="v">${o.id}</span></div>
+          <div class="row"><span class="k">Customer</span><span class="v">${o.customer}</span></div>
+          <div class="row"><span class="k">Merchant</span><span class="v">${o.merchant}</span></div>
+          <div class="row"><span class="k">Placed</span><span class="v">${o.placed}</span></div>
+          <div class="row"><span class="k">Status</span><span class="v"><span class="status ${statusClass(o.status)}">${o.status.replace('_',' ')}</span></span></div>
+          <div class="row"><span class="k">Driver</span><span class="v">${o.driver || '—'}</span></div>
+          <div class="row"><span class="k">Subtotal</span><span class="v">₹ ${o.subtotal}</span></div>
+          <div class="items">
+            <h2 style="margin-top:16px">Items</h2>
+            ${o.items.map(i => `<div class="row"><span class="k">${i.n} × ${i.q}</span><span class="v">₹ ${i.p*i.q}</span></div>`).join("")}
+          </div>
+          <div class="hairline"></div>
+          <div class="actions">
+            <button id="btn-refund">Issue refund</button>
+            <button id="btn-dispatch">Dispatch new driver</button>
+            <button id="btn-cancel" class="primary">Cancel order</button>
+          </div>
+        `;
+        document.getElementById("btn-refund").addEventListener("click", () => openRefund(o));
+        document.getElementById("btn-dispatch").addEventListener("click", () => dispatch(o));
+        document.getElementById("btn-cancel").addEventListener("click", () => cancelOrder(o));
+      }
+
+      function select(id) { state.selected = id; renderList(); renderDetail(); }
+
+      function openRefund(o) {
+        document.getElementById("refund-order").value = o.id;
+        document.getElementById("refund-amount").value = "";
+        document.getElementById("refund-reason").value = "";
+        document.getElementById("refund-dialog").showModal();
+      }
+
+      document.getElementById("refund-cancel").addEventListener("click", () => {
+        document.getElementById("refund-dialog").close();
+      });
+      document.getElementById("refund-confirm").addEventListener("click", () => {
+        const amt = document.getElementById("refund-amount").value;
+        const reason = document.getElementById("refund-reason").value;
+        const order = document.getElementById("refund-order").value;
+        document.getElementById("refund-dialog").close();
+        toast(`Refund of ₹ ${amt} on ${order} — ${reason || 'no reason'}`);
+      });
+
+      function dispatch(o) {
+        o.driver = "Kabir · +91 99887 72211 (replacement)";
+        o.status = "in_transit";
+        renderList(); renderDetail();
+        toast(`Replacement driver dispatched to ${o.id}.`);
+      }
+      function cancelOrder(o) {
+        o.status = "cancelled";
+        renderList(); renderDetail();
+        toast(`${o.id} cancelled. Customer will see a refund prompt.`);
+      }
+
+      function toast(msg) {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.classList.add("show");
+        clearTimeout(window.__tt);
+        window.__tt = setTimeout(() => t.classList.remove("show"), 2800);
+      }
+
+      renderList();
+    </script>
+  </body>
+</html>
