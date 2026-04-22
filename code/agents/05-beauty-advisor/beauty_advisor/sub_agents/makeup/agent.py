@@ -18,6 +18,12 @@ _LOW_THINKING = BuiltInPlanner(
     ),
 )
 
+_MINIMAL_THINKING = BuiltInPlanner(
+    thinking_config=genai_types.ThinkingConfig(
+        thinking_level=genai_types.ThinkingLevel.MINIMAL,
+    ),
+)
+
 
 WORKER_MODEL = os.environ.get("BEAUTY_WORKER_MODEL", "gemini-3.1-flash-lite-preview")
 COORDINATOR_MODEL = os.environ.get("BEAUTY_COORDINATOR_MODEL", "gemini-3-flash-preview")
@@ -33,6 +39,7 @@ primer_specialist = LlmAgent(
         "for oily. Reply with one line: brand, name, price, reason."
     ),
     tools=[get_profile, search_makeup],
+    planner=_MINIMAL_THINKING,
     output_key="primer_pick",
 )
 
@@ -49,6 +56,7 @@ foundation_specialist = LlmAgent(
         "(light) or 'full'. Reply with one line."
     ),
     tools=[get_profile, search_makeup],
+    planner=_MINIMAL_THINKING,
     output_key="foundation_pick",
 )
 
@@ -64,6 +72,7 @@ setting_specialist = LlmAgent(
         "translucent spray for combination. Two lines."
     ),
     tools=[get_profile, search_makeup],
+    planner=_MINIMAL_THINKING,
     output_key="setting_pick",
 )
 

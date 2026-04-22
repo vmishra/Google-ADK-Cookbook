@@ -33,6 +33,14 @@ _LOW_THINKING = BuiltInPlanner(
     ),
 )
 
+# Canonical pairing for Flash-Lite specialists — MINIMAL matches
+# Google's Flash-Lite samples and keeps per-call latency tight.
+_MINIMAL_THINKING = BuiltInPlanner(
+    thinking_config=genai_types.ThinkingConfig(
+        thinking_level=genai_types.ThinkingLevel.MINIMAL,
+    ),
+)
+
 
 WORKER_MODEL = os.environ.get("BEAUTY_WORKER_MODEL", "gemini-3.1-flash-lite-preview")
 COORDINATOR_MODEL = os.environ.get("BEAUTY_COORDINATOR_MODEL", "gemini-3-flash-preview")
@@ -52,6 +60,7 @@ cleanser_specialist = LlmAgent(
         "product name, price in INR, and the single reason you chose it."
     ),
     tools=[get_profile, search_skincare],
+    planner=_MINIMAL_THINKING,
     output_key="cleanser_pick",
 )
 
@@ -72,6 +81,7 @@ treatment_specialist = LlmAgent(
         "Reply with one line: the product and why this active fits."
     ),
     tools=[get_profile, search_skincare],
+    planner=_MINIMAL_THINKING,
     output_key="treatment_pick",
 )
 
@@ -89,6 +99,7 @@ moisturiser_spf_specialist = LlmAgent(
         "Reply with two lines: moisturiser, SPF."
     ),
     tools=[get_profile, search_skincare],
+    planner=_MINIMAL_THINKING,
     output_key="base_pick",
 )
 

@@ -18,6 +18,12 @@ _LOW_THINKING = BuiltInPlanner(
     ),
 )
 
+_MINIMAL_THINKING = BuiltInPlanner(
+    thinking_config=genai_types.ThinkingConfig(
+        thinking_level=genai_types.ThinkingLevel.MINIMAL,
+    ),
+)
+
 
 WORKER_MODEL = os.environ.get("BEAUTY_WORKER_MODEL", "gemini-3.1-flash-lite-preview")
 COORDINATOR_MODEL = os.environ.get("BEAUTY_COORDINATOR_MODEL", "gemini-3-flash-preview")
@@ -34,6 +40,7 @@ wash_specialist = LlmAgent(
         "Thick/dry → hydrating. Two lines."
     ),
     tools=[get_profile, search_haircare],
+    planner=_MINIMAL_THINKING,
     output_key="wash_pick",
 )
 
@@ -49,6 +56,7 @@ treatment_specialist = LlmAgent(
         "'no weekly treatment needed'. One line."
     ),
     tools=[get_profile, search_haircare],
+    planner=_MINIMAL_THINKING,
     output_key="treatment_pick",
 )
 
@@ -63,6 +71,7 @@ styling_specialist = LlmAgent(
         "`search_haircare(category='styling', …)`. One line."
     ),
     tools=[get_profile, search_haircare],
+    planner=_MINIMAL_THINKING,
     output_key="styling_pick",
 )
 
