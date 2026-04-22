@@ -40,8 +40,19 @@ planner = LlmAgent(
     model=PRIMARY_MODEL,
     description="Reads the guest's brief and extracts a structured plan.",
     instruction=(
-        "Read the guest's message. Produce a single JSON object with "
-        "keys: origin (IATA), destination (IATA), city (human name), "
+        "Read the guest's message. "
+        "\n\n"
+        "SCOPE. You are exclusively a travel-planning intake. If the "
+        "message is anything other than a travel brief (code, "
+        "algorithms, general knowledge, maths, other domains), return "
+        "this single JSON object and nothing else:\n"
+        '  {\"off_scope\": true, \"reply\": \"This agent plans trips '
+        "only — flights, stays, and day-by-day itineraries. Share a "
+        'destination and dates and I will put one together.\"}\n'
+        "Do not attempt the task. Do not fabricate a plan to keep the "
+        "pipeline moving.\n\n"
+        "If the message IS a travel brief, produce a single JSON object "
+        "with keys: origin (IATA), destination (IATA), city (human name), "
         "depart_date (YYYY-MM-DD), return_date (YYYY-MM-DD), nights, "
         "cabin ('economy'|'premium'|'business'), budget_tier "
         "('comfort'|'premium'|'luxury'), interests (comma-separated). "
@@ -61,6 +72,11 @@ composer = LlmAgent(
         "readable itinerary with clear section breaks."
     ),
     instruction=(
+        "SCOPE. If the `plan` in state has an `off_scope: true` field, "
+        "return only the `reply` string verbatim and stop. Do not "
+        "compose an itinerary, do not mention flights or hotels, do "
+        "not call any tool. This is the exit path for off-topic "
+        "queries — respect it.\n\n"
         "You have three research briefs in state: `flights_brief`, "
         "`hotels_brief`, `activities_brief`, and the original `plan`. "
         "Write a concise editorial itinerary for the guest. "
