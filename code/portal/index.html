@@ -1,13 +1,24 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ADK — workshop</title>
+    <title>ADK · reference</title>
     <meta
       name="description"
-      content="Four ADK agents — concierge, travel planner, payments voice, food delivery computer-use — running on your machine."
+      content="A reference implementation of Google ADK across five production agent shapes — concierge, travel planner, voice support, computer-use, hierarchical advisor."
     />
+    <script>
+      // Resolve the theme before first paint so we never flash dark on
+      // light or vice versa. Mirrors lib/theme.ts.
+      try {
+        var saved = localStorage.getItem('adk-theme');
+        var preferDark = window.matchMedia &&
+          window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var theme = saved || (preferDark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) { /* first visit, default stays 'light' */ }
+    </script>
     <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-sans@5.0.1/500.css" />
     <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.0.1/500.css" />
     <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/@fontsource/fraunces@5.0.17/400-italic.css" />
