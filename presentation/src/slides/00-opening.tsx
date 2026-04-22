@@ -85,7 +85,7 @@ function OpeningDiagram({ level }: { level: "beginner" | "intermediate" | "advan
       <Node x={500} y={130} kind="user" title="User"        subtitle="text · voice · vision" />
       <Node x={820} y={320} kind="tool" title="Tools"       subtitle="fn · mcp · openapi · agent" />
       <Node x={500} y={510} kind="service" tone="trace" title="Services" subtitle="session · memory · artifact" />
-      <Node x={180} y={320} kind="model" title="Model"      subtitle="gemini · claude · ollama" />
+      <Node x={180} y={320} kind="model" title="Model"      subtitle="gemini · litellm · ollama" />
 
       <Edge from={{ x: 500, y: 168 }} to={{ x: 500, y: 280 }} arrow="forward" travel travelDuration={1.7} />
       <Edge from={{ x: 598, y: 320 }} to={{ x: 722, y: 320 }} arrow="both"    travel travelDuration={1.9} />
