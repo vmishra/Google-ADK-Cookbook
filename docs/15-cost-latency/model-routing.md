@@ -56,7 +56,7 @@ from google.adk.models.lite_llm import LiteLlm
 
 agent = LlmAgent(
     name="cross",
-    model=LiteLlm(model="openai/gpt-4o", fallbacks=["anthropic/claude-3-5-sonnet"]),
+    model=LiteLlm(model="openai/gpt-4o", fallbacks=["anthropic/claude-sonnet-4-6"]),
     tools=[...])
 ```
 
