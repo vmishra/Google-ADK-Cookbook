@@ -7,8 +7,9 @@ agent — they are building the thing other teams will build agents
 on. The platform. The harness. The runtime that is itself the
 product.
 
-If you have used Cursor, Devin, Replit Agent, Aider, or any in-house
-"coding assistant" or "workflow orchestrator" — those are harnesses. They are long-lived agent runtimes with their own UX,
+If you have used Claude Code, Cursor, Devin, Replit Agent, or any
+in-house "coding assistant" or "workflow orchestrator" — those are
+harnesses. They are long-lived agent runtimes with their own UX,
 session semantics, safety layer, billing, multi-tenancy, and
 evaluation. ADK is unusually good at being the substrate for one.
 
@@ -84,7 +85,7 @@ compound when you are the platform, not the agent author:
 | [Custom services](custom-services.md) | Implementing the five service interfaces |
 | [Multi-tenant](multi-tenant.md) | Isolation, quotas, billing |
 | [Harness patterns](harness-patterns.md) | Registries, agent loading, per-tenant overrides |
-| [Case study — a coding assistant harness](coding-assistant-harness.md) | A Cursor/Aider-style coding-assistant harness in ADK |
+| [Case study — a coding assistant harness](coding-assistant-harness.md) | A Claude-Code-like harness in ADK |
 
 ---
 

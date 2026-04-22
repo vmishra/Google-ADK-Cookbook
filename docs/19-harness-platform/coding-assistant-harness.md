@@ -3,7 +3,7 @@
 <span class="kicker">ch 19 · page 6 of 6</span>
 
 A worked example of a harness you could actually ship: a coding
-assistant like Cursor Agent, Aider, or Devin, but built on ADK. This
+assistant like Claude Code or Cursor Agent, but built on ADK. This
 page is not a complete implementation — it is the architecture you
 would follow if you sat down to build one tomorrow.
 

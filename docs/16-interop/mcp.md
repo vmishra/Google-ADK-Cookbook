@@ -25,9 +25,9 @@ agent = LlmAgent(tools=[slack], ...)
 
 ## Exposing an ADK agent's tools as MCP
 
-Sometimes you want a non-ADK consumer (a third-party assistant, a
-LangGraph workflow, a custom MCP client) to use tools your ADK team
-already wrote. Wrap them in an MCP server.
+Sometimes you want a non-ADK consumer (a Claude-based assistant, a
+LangGraph workflow) to use tools your ADK team already wrote. Wrap
+them in an MCP server.
 
 ```python
 # serve_mcp.py
