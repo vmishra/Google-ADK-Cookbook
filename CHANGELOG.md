@@ -27,7 +27,8 @@ The format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 ### Versions referenced
 
 - ADK Python: 1.31.1.
-- Gemini models: `gemini-2.5-flash`, `gemini-2.5-pro`,
-  `gemini-2.5-flash-lite`, `gemini-live-2.5-flash-native-audio`
-  (Vertex), `gemini-2.5-flash-native-audio-preview-12-2025`
-  (Gemini API), `gemini-2.5-computer-use-preview-10-2025`.
+- Gemini models: `gemini-3.1-flash`, `gemini-3.1-pro`,
+  `gemini-3.1-flash-lite`, `gemini-live-2.5-flash-native-audio`
+  (Vertex — the only Live generation currently shipped),
+  `gemini-2.5-flash-native-audio-preview-12-2025` (Gemini API Live),
+  `gemini-2.5-computer-use-preview-10-2025`.
