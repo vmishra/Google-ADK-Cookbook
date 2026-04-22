@@ -16,7 +16,8 @@ code/
     02-travel-planner                 Deep-research planner. Sequential + parallel sub-agents.
     03-payments-support               Voice support for a payments company. Gemini Live.
     04-food-delivery-support          Computer-use support agent against a mock dashboard.
-  scripts/dev-all.sh                  Start every server + the portal.
+    05-beauty-advisor                 Three-tier hierarchy — root, coordinators, specialists.
+  scripts/workshop-up.sh              Start every server + the portal.
 ```
 
 Each agent folder is a standalone Python project with its own
@@ -30,6 +31,7 @@ each agent's local port.
 | 02 | Travel planner | `SequentialAgent` wrapping a `ParallelAgent` | 8002 |
 | 03 | Payments voice support | `run_live()` over WebSocket | 8003 |
 | 04 | Food delivery support | Computer-use via `ComputerUseToolset` | 8004 |
+| 05 | Beauty advisor | 3-tier hierarchy · skills · memory | 8005 |
 | — | Portal | Vite + React, DESIGN.md tokens | 5174 |
 
 ## Before you run

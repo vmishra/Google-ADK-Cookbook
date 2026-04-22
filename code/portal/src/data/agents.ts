@@ -134,6 +134,35 @@ export const AGENTS: AgentMeta[] = [
       "Cancel FD-71078. The customer asked me to.",
     ],
   },
+  {
+    id: "beauty-advisor",
+    number: "05",
+    title: "Beauty advisor",
+    subtitle: "Three-tier hierarchy with skills + memory.",
+    kicker: "beauty · advanced",
+    summary:
+      "Root advisor → three coordinators (skincare, makeup, haircare) " +
+      "→ nine specialist sub-agents. Skills are unlocked progressively, " +
+      "profile memory is shared across the whole hierarchy, and three " +
+      "model tiers balance cost against the work each layer does.",
+    baseUrl: "http://127.0.0.1:8005",
+    modality: "text",
+    pattern: "LlmAgent + sub_agents + AgentTool specialists",
+    models: ["gemini-3.1-flash", "gemini-3.1-flash-lite"],
+    difficulty: "advanced",
+    notice: [
+      "Two kinds of delegation — sub_agents for transfer, AgentTool for composition.",
+      "Skills registry with card / playbook split — root stays small.",
+      "Profile memory is the shared context carrying across the hierarchy.",
+      "Three model tiers: root, coordinators, specialists.",
+    ],
+    prompts: [
+      "Hi, I'm looking for help with skincare. Combination skin, breakouts on my chin, mid-range budget, prefer fragrance-free.",
+      "Can you sort out a foundation too? Neutral undertone, medium coverage, satin finish.",
+      "Let's add haircare — fine, wavy, recently coloured, I'm in Mumbai.",
+      "I'd rather skip retinol, it's too much for my skin.",
+    ],
+  },
 ];
 
 export function findAgent(id: string): AgentMeta | undefined {

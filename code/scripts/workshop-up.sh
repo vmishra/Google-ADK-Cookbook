@@ -29,10 +29,11 @@ start_agent() {
   pids+=("$!")
 }
 
-start_agent 01-concierge            8001 concierge
-start_agent 02-travel-planner       8002 travel-planner
-start_agent 03-payments-support     8003 payments-support
+start_agent 01-concierge             8001 concierge
+start_agent 02-travel-planner        8002 travel-planner
+start_agent 03-payments-support      8003 payments-support
 start_agent 04-food-delivery-support 8004 food-delivery-support
+start_agent 05-beauty-advisor        8005 beauty-advisor
 
 (
   cd portal
@@ -48,6 +49,7 @@ echo "concierge       http://127.0.0.1:8001"
 echo "travel planner  http://127.0.0.1:8002"
 echo "payments voice  http://127.0.0.1:8003"
 echo "food delivery   http://127.0.0.1:8004"
+echo "beauty advisor  http://127.0.0.1:8005"
 echo
 echo "logs in .logs/"
 echo "Ctrl-C to stop."
