@@ -20,7 +20,7 @@
  *   - Instruction blocks render as mono 12.5 px with paragraph
  *     breaks preserved but tracking slightly loosened for scannability.
  */
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { Bot, Layers, Shuffle, Repeat2, Wrench, PackageOpen } from "lucide-react";
 
@@ -270,8 +270,22 @@ function NodeCard({
 }) {
   const style = kindStyle(node.kind);
   const Icon = style.icon;
+  const ref = useRef<HTMLButtonElement | null>(null);
+
+  // Scroll the active node into view when it starts speaking so the
+  // reader never has to hunt for which piece of the tree is live.
+  useEffect(() => {
+    if (!active || !ref.current) return;
+    ref.current.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+      inline: "nearest",
+    });
+  }, [active]);
+
   return (
     <button
+      ref={ref}
       type="button"
       onClick={onClick}
       className={cn(
@@ -280,7 +294,9 @@ function NodeCard({
           ? "border-[var(--accent)] bg-[var(--elev-2)]"
           : "border-[var(--border)] hover:border-[var(--border-strong)] hover:bg-[var(--elev-2)]",
       )}
-      style={{ boxShadow: selected ? "var(--shadow-1)" : undefined }}
+      style={{
+        boxShadow: selected ? "var(--shadow-1)" : undefined,
+      }}
     >
       {/* colour rail */}
       <span
@@ -301,6 +317,15 @@ function NodeCard({
             >
               {style.kindLabel}
             </span>
+            {active && (
+              <span
+                className="ml-auto inline-flex items-center gap-1 text-[9.5px] tracking-[0.22em] uppercase font-[var(--font-mono)] font-medium whitespace-nowrap"
+                style={{ color: "var(--accent)" }}
+              >
+                <span className="h-1.5 w-1.5 rounded-full" style={{ background: "var(--accent)" }} />
+                live
+              </span>
+            )}
           </div>
           {node.model && (
             <div className="text-[11px] font-[var(--font-mono)] text-[var(--text-muted)] mt-0.5 truncate">
@@ -319,20 +344,38 @@ function NodeCard({
           )}
         </div>
       </div>
+
+      {/* Active state: breathing champagne ring + inner soft glow. */}
       {active && (
-        <span
-          className="absolute inset-0 rounded-[var(--radius-md)] pointer-events-none"
-          style={{
-            boxShadow: "0 0 0 1px var(--accent), 0 0 16px -4px var(--accent)",
-            animation: "adk-node-pulse 1.6s ease-in-out infinite",
-          }}
-          aria-hidden
-        />
+        <>
+          <span
+            className="absolute inset-0 rounded-[var(--radius-md)] pointer-events-none"
+            style={{
+              boxShadow: "0 0 0 1px var(--accent), 0 0 24px -4px var(--accent)",
+              animation: "adk-node-glow 1.8s ease-in-out infinite",
+            }}
+            aria-hidden
+          />
+          <span
+            className="absolute -inset-[3px] rounded-[calc(var(--radius-md)+3px)] pointer-events-none"
+            style={{
+              border: "1px solid var(--accent)",
+              opacity: 0.35,
+              animation: "adk-node-ripple 1.8s ease-out infinite",
+            }}
+            aria-hidden
+          />
+        </>
       )}
       <style>{`
-        @keyframes adk-node-pulse {
+        @keyframes adk-node-glow {
           0%, 100% { opacity: 1; }
           50%      { opacity: 0.55; }
+        }
+        @keyframes adk-node-ripple {
+          0%   { transform: scale(1);    opacity: 0.5; }
+          80%  { transform: scale(1.04); opacity: 0;   }
+          100% { transform: scale(1.04); opacity: 0;   }
         }
       `}</style>
     </button>

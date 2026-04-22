@@ -10,6 +10,7 @@ interface Props {
   dashboardUrl: string;
   onTurn?: (m: any) => void;
   onActive?: (a: boolean) => void;
+  onAuthor?: (author: string | null) => void;
 }
 
 /**
@@ -18,13 +19,13 @@ interface Props {
  * Chromium window (headful), but we also embed the static view here so
  * the operator can see the same state.
  */
-export function ComputerUsePane({ baseUrl, prompts, dashboardUrl, onTurn, onActive }: Props) {
+export function ComputerUsePane({ baseUrl, prompts, dashboardUrl, onTurn, onActive, onAuthor }: Props) {
   const [tab, setTab] = useState<"chat" | "canvas">("chat");
 
   return (
     <div className="grid h-full" style={{ gridTemplateColumns: "minmax(320px, 420px) 1fr" }}>
       <div className="border-r border-[var(--border)] flex flex-col min-h-0">
-        <ChatPanel baseUrl={baseUrl} prompts={prompts} onTurn={onTurn} onActive={onActive} />
+        <ChatPanel baseUrl={baseUrl} prompts={prompts} onTurn={onTurn} onActive={onActive} onAuthor={onAuthor} />
       </div>
       <div className="flex flex-col min-h-0">
         <div className="h-10 flex items-center gap-1 px-3 border-b border-[var(--border)] text-[11px] tracking-[0.18em] uppercase font-[var(--font-mono)] text-[var(--text-subtle)]">

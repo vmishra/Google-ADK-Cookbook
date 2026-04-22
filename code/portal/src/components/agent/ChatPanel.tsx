@@ -13,6 +13,7 @@ interface Props {
   prompts: string[];
   onTurn?: (metrics: any) => void;
   onActive?: (active: boolean) => void;
+  onAuthor?: (author: string | null) => void;
   showAuthor?: boolean;
 }
 
@@ -63,7 +64,7 @@ type Turn =
     }
   | { kind: "error"; text: string };
 
-export function ChatPanel({ baseUrl, prompts, onActive, showAuthor }: Props) {
+export function ChatPanel({ baseUrl, prompts, onActive, onAuthor, showAuthor }: Props) {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [reachable, setReachable] = useState<boolean | null>(null);
   const [turns, setTurns] = useState<Turn[]>([]);
@@ -121,6 +122,11 @@ export function ChatPanel({ baseUrl, prompts, onActive, showAuthor }: Props) {
         signal: ac.signal,
       });
       for await (const evt of streamSSE(r, ac.signal)) {
+        // Publish the speaking author on every event that carries one
+        // — the architecture pane uses this to pulse the active node.
+        if (typeof evt.author === "string" && evt.author) {
+          onAuthor?.(evt.author);
+        }
         if (evt.kind === "text") {
           setTurns((arr) => {
             const copy = [...arr];
@@ -218,6 +224,7 @@ export function ChatPanel({ baseUrl, prompts, onActive, showAuthor }: Props) {
     } finally {
       setBusy(false);
       onActive?.(false);
+      onAuthor?.(null);
     }
   };
 

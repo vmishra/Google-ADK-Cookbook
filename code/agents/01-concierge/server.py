@@ -114,32 +114,31 @@ async def _stream(session_id: str, message: str) -> AsyncIterator[str]:
         ):
             turn.record_usage(getattr(event, "usage_metadata", None))
             turn.record_event_signals(event)
+            author = event.author or root_agent.name
             for part in (event.content.parts if event.content else []):
                 if part.text:
                     turn.mark_first_token()
-                    yield _sse({"kind": "text", "data": part.text})
+                    yield _sse({"kind": "text", "author": author, "data": part.text})
                 if part.function_call:
                     turn.record_tool_call()
                     yield _sse({
                         "kind": "tool_call",
+                        "author": author,
                         "name": part.function_call.name,
                         "args": dict(part.function_call.args or {}),
                     })
                 if part.function_response:
                     yield _sse({
                         "kind": "tool_result",
+                        "author": author,
                         "name": part.function_response.name,
                         "data": part.function_response.response,
                     })
-            # After every event, emit a live metrics tick so the portal
-            # ribbon updates in real time (tokens ticking up, latency
-            # climbing, etc.). The final snapshot still rides on
-            # turn_complete.
-            yield _sse({"kind": "metrics_tick", "metrics": turn.as_dict()})
+            yield _sse({"kind": "metrics_tick", "author": author, "metrics": turn.as_dict()})
             if event.is_final_response():
                 turn.finish()
                 metrics.record(turn)
-                yield _sse({"kind": "turn_complete", "metrics": turn.as_dict()})
+                yield _sse({"kind": "turn_complete", "author": author, "metrics": turn.as_dict()})
     except Exception as e:  # surface a calm error to the client
         turn.finish(error=str(e))
         metrics.record(turn)

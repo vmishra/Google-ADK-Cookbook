@@ -22,6 +22,7 @@ interface Props {
 export function AgentPage({ id }: Props) {
   const agent = findAgent(id);
   const [active, setActive] = useState(false);
+  const [activeAuthor, setActiveAuthor] = useState<string | null>(null);
   const [leftTab, setLeftTab] = useState<LeftTab>("overview");
 
   if (!agent) {
@@ -58,7 +59,7 @@ export function AgentPage({ id }: Props) {
             {leftTab === "overview" ? (
               <LeftColumn agent={agent} />
             ) : (
-              <AgentArchitecture baseUrl={agent.baseUrl} />
+              <AgentArchitecture baseUrl={agent.baseUrl} activeAuthor={activeAuthor} />
             )}
           </div>
         </aside>
@@ -78,12 +79,14 @@ export function AgentPage({ id }: Props) {
                 prompts={agent.prompts}
                 dashboardUrl={agent.dashboardUrl}
                 onActive={setActive}
+                onAuthor={setActiveAuthor}
               />
             ) : (
               <ChatPanel
                 baseUrl={agent.baseUrl}
                 prompts={agent.prompts}
                 onActive={setActive}
+                onAuthor={setActiveAuthor}
                 showAuthor={agent.modality === "deep-research"}
               />
             )}
