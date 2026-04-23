@@ -53,3 +53,7 @@ service-account*.json
 # Logs
 *.log
 logs/
+
+# Lifecycle-script state
+.mkdocs.pid
+presentation/.dev-server.pid
