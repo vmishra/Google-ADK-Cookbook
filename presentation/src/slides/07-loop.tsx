@@ -45,13 +45,17 @@ export function LoopScene() {
 function LoopDiagram({ level: _level }: { level: "beginner" | "intermediate" | "advanced" }) {
   return (
     <Canvas>
-      {/* Curving loop */}
+      {/* Decorative loop outline — pushed wider and drawn in a hairline
+          so it doesn't cross the labels between the iter and output
+          nodes. The real "loop" semantics come from the two labelled
+          edges below; this is visual reinforcement only. */}
       <motion.path
-        d="M 200 320 C 280 150, 720 150, 800 320 C 720 490, 280 490, 200 320"
+        d="M 200 320 C 260  90, 740  90, 800 320 C 740 550, 260 550, 200 320"
         fill="none"
-        stroke="var(--border-strong)"
-        strokeWidth={1}
-        strokeDasharray="4 6"
+        stroke="var(--border)"
+        strokeWidth={0.75}
+        strokeOpacity={0.55}
+        strokeDasharray="3 7"
         initial={{ pathLength: 0 }}
         animate={{ pathLength: 1 }}
         transition={{ duration: 1.5, ease: "easeInOut" }}
