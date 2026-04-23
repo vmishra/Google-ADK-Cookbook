@@ -8,6 +8,7 @@ import { ChatPanel } from "@/components/agent/ChatPanel";
 import { VoicePanel } from "@/components/agent/VoicePanel";
 import { ComputerUsePane } from "@/components/agent/ComputerUsePane";
 import { EvalPanel } from "@/components/agent/EvalPanel";
+import { VideoPanel } from "@/components/agent/VideoPanel";
 import { MetricsRibbon } from "@/components/agent/MetricsRibbon";
 import { AgentArchitecture } from "@/components/agent/AgentArchitecture";
 import { fadeRise } from "@/lib/motion";
@@ -143,6 +144,8 @@ export function AgentPage({ id }: Props) {
                 baseUrl={agent.baseUrl}
                 onActive={setActive}
               />
+            ) : agent.modality === "video" ? (
+              <VideoPanel baseUrl={agent.baseUrl} onActive={setActive} />
             ) : agent.modality === "eval" ? (
               <EvalPanel baseUrl={agent.baseUrl} onActive={setActive} />
             ) : agent.modality === "computer-use" && agent.dashboardUrl ? (

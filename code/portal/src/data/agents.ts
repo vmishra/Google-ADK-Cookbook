@@ -285,6 +285,35 @@ export const AGENTS: AgentMeta[] = [
       "Does the cookbook discuss running agents on Cloud Run?",
     ],
   },
+  {
+    id: "video-coach",
+    number: "10",
+    title: "Live video coach",
+    subtitle: "Field service — the agent sees what you see.",
+    kicker: "field service · live video",
+    summary:
+      "A technician points the camera at an appliance; the coach " +
+      "watches at ~1fps, names the fault in the catalogue's vocabulary, " +
+      "and pulls the right spare. Gemini 3.1 Flash Live preview with " +
+      "TEXT response modality — captions under a live video preview.",
+    baseUrl: "http://127.0.0.1:8010",
+    modality: "video",
+    pattern: "LlmAgent + run_live() with image/jpeg Blob frames",
+    models: ["gemini-3.1-flash-live-preview"],
+    toolCount: 2,
+    difficulty: "advanced",
+    notice: [
+      "The browser captures webcam at ~1fps and streams base64 JPEG over WebSocket.",
+      "Response modality is TEXT — captions, not speech. Voice is agent 03's story.",
+      "Session resumption + context-window compression carry long calls.",
+      "Two grounding tools keep the coach in the catalogue: lookup_appliance + list_spares.",
+    ],
+    prompts: [
+      "Point the camera at the rating plate — read the model and tell me the common faults.",
+      "Walk me through diagnosing ice on the back wall of a fridge.",
+      "This washer is dropping mid-cycle with E04 — what should I check?",
+    ],
+  },
 ];
 
 export function findAgent(id: string): AgentMeta | undefined {
