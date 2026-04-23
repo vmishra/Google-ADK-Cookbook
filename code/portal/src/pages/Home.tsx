@@ -370,6 +370,8 @@ function modalityLabel(m: AgentMeta["modality"]): string {
       voice: "voice",
       "computer-use": "computer-use",
       "deep-research": "deep-research",
+      eval: "eval",
+      video: "video",
     } as const
   )[m];
 }

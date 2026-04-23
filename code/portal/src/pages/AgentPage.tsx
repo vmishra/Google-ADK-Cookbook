@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 
 import { findAgent } from "@/data/agents";
@@ -7,6 +7,7 @@ import { Chip } from "@/components/primitives/Chip";
 import { ChatPanel } from "@/components/agent/ChatPanel";
 import { VoicePanel } from "@/components/agent/VoicePanel";
 import { ComputerUsePane } from "@/components/agent/ComputerUsePane";
+import { EvalPanel } from "@/components/agent/EvalPanel";
 import { MetricsRibbon } from "@/components/agent/MetricsRibbon";
 import { AgentArchitecture } from "@/components/agent/AgentArchitecture";
 import { fadeRise } from "@/lib/motion";
@@ -19,11 +20,70 @@ interface Props {
   id: string;
 }
 
+const LEFT_WIDTH_KEY = "portal:leftPaneWidth";
+const LEFT_MIN = 280;
+const LEFT_MAX_RATIO = 0.7; // never more than 70% of the viewport
+const LEFT_DEFAULT = 380;
+
+function readStoredLeftWidth(): number {
+  if (typeof window === "undefined") return LEFT_DEFAULT;
+  const raw = window.localStorage.getItem(LEFT_WIDTH_KEY);
+  const n = raw ? Number(raw) : NaN;
+  return Number.isFinite(n) && n >= LEFT_MIN ? n : LEFT_DEFAULT;
+}
+
 export function AgentPage({ id }: Props) {
   const agent = findAgent(id);
   const [active, setActive] = useState(false);
   const [activeAuthor, setActiveAuthor] = useState<string | null>(null);
   const [leftTab, setLeftTab] = useState<LeftTab>("overview");
+  const [leftWidth, setLeftWidth] = useState<number>(() => readStoredLeftWidth());
+  const [dragging, setDragging] = useState(false);
+  const shellRef = useRef<HTMLDivElement | null>(null);
+
+  const clampWidth = useCallback((px: number) => {
+    const max = Math.max(LEFT_MIN + 120, Math.round(window.innerWidth * LEFT_MAX_RATIO));
+    return Math.min(max, Math.max(LEFT_MIN, Math.round(px)));
+  }, []);
+
+  useEffect(() => {
+    const onResize = () => setLeftWidth((w) => clampWidth(w));
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [clampWidth]);
+
+  const startDrag = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      const shell = shellRef.current;
+      if (!shell) return;
+      const shellLeft = shell.getBoundingClientRect().left;
+      setDragging(true);
+
+      const onMove = (ev: PointerEvent) => {
+        setLeftWidth(clampWidth(ev.clientX - shellLeft));
+      };
+      const onUp = () => {
+        setDragging(false);
+        window.removeEventListener("pointermove", onMove);
+        window.removeEventListener("pointerup", onUp);
+        window.removeEventListener("pointercancel", onUp);
+        setLeftWidth((w) => {
+          window.localStorage.setItem(LEFT_WIDTH_KEY, String(w));
+          return w;
+        });
+      };
+      window.addEventListener("pointermove", onMove);
+      window.addEventListener("pointerup", onUp);
+      window.addEventListener("pointercancel", onUp);
+    },
+    [clampWidth],
+  );
+
+  const resetWidth = useCallback(() => {
+    setLeftWidth(LEFT_DEFAULT);
+    window.localStorage.setItem(LEFT_WIDTH_KEY, String(LEFT_DEFAULT));
+  }, []);
 
   if (!agent) {
     return (
@@ -47,12 +107,17 @@ export function AgentPage({ id }: Props) {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-[var(--surface)]">
+    <div
+      className={cn(
+        "h-screen flex flex-col bg-[var(--surface)]",
+        dragging && "select-none cursor-col-resize",
+      )}
+    >
       <Topbar crumb={`${agent.number} · ${agent.title}`} active={active} />
-      <div className="flex-1 flex overflow-hidden">
+      <div ref={shellRef} className="flex-1 flex overflow-hidden">
         <aside
-          className="w-[380px] shrink-0 border-r border-[var(--border)] flex flex-col min-h-0"
-          style={{ background: "var(--surface-raised)" }}
+          className="shrink-0 border-r border-[var(--border)] flex flex-col min-h-0"
+          style={{ width: leftWidth, background: "var(--surface-raised)" }}
         >
           <LeftTabs tab={leftTab} onChange={setLeftTab} />
           <div className="flex-1 overflow-auto">
@@ -63,6 +128,11 @@ export function AgentPage({ id }: Props) {
             )}
           </div>
         </aside>
+        <PaneResizer
+          onPointerDown={startDrag}
+          onDoubleClick={resetWidth}
+          active={dragging}
+        />
         <main className="flex-1 flex flex-col min-w-0">
           <div className="border-b border-[var(--border)] px-5 py-3 bg-[var(--surface)]">
             <MetricsRibbon baseUrl={agent.baseUrl} />
@@ -73,6 +143,8 @@ export function AgentPage({ id }: Props) {
                 baseUrl={agent.baseUrl}
                 onActive={setActive}
               />
+            ) : agent.modality === "eval" ? (
+              <EvalPanel baseUrl={agent.baseUrl} onActive={setActive} />
             ) : agent.modality === "computer-use" && agent.dashboardUrl ? (
               <ComputerUsePane
                 baseUrl={agent.baseUrl}
@@ -93,6 +165,39 @@ export function AgentPage({ id }: Props) {
           </div>
         </main>
       </div>
+    </div>
+  );
+}
+
+function PaneResizer({
+  onPointerDown,
+  onDoubleClick,
+  active,
+}: {
+  onPointerDown: (e: React.PointerEvent<HTMLDivElement>) => void;
+  onDoubleClick: () => void;
+  active: boolean;
+}) {
+  return (
+    <div
+      role="separator"
+      aria-orientation="vertical"
+      title="Drag to resize · double-click to reset"
+      onPointerDown={onPointerDown}
+      onDoubleClick={onDoubleClick}
+      className={cn(
+        "relative shrink-0 cursor-col-resize group",
+        "w-[6px] -mx-[3px] z-10",
+      )}
+    >
+      <span
+        className={cn(
+          "absolute inset-y-0 left-1/2 -translate-x-1/2 w-px transition-colors",
+          active
+            ? "bg-[var(--accent)]"
+            : "bg-[var(--border)] group-hover:bg-[var(--accent)]",
+        )}
+      />
     </div>
   );
 }

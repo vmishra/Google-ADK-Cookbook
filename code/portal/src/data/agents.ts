@@ -4,7 +4,13 @@
  * on each agent's page to wire the correct chat / voice / computer-use panel.
  */
 
-export type Modality = "text" | "voice" | "computer-use" | "deep-research";
+export type Modality =
+  | "text"
+  | "voice"
+  | "computer-use"
+  | "deep-research"
+  | "eval"
+  | "video";
 
 export interface AgentMeta {
   id: string;
@@ -220,6 +226,34 @@ export const AGENTS: AgentMeta[] = [
       "Pull APP-501 and let's work the file.",
       "Look at APP-612. Work it end to end — bureau, EMI, decision.",
       "APP-704 — they're asking for ₹7.5L at 30 months, business is export packaging. What's the call?",
+    ],
+  },
+  {
+    id: "eval-harness",
+    number: "08",
+    title: "Eval harness",
+    subtitle: "Regression suites with pass/fail tiles.",
+    kicker: "quality · evaluation",
+    summary:
+      "Loads canned prompts with deterministic rubrics (substring, " +
+      "tool-call presence, latency cap), runs them against a live " +
+      "target agent over HTTP, and streams per-case verdicts as tiles. " +
+      "Evaluation at the boundary — target is a black box.",
+    baseUrl: "http://127.0.0.1:8008",
+    modality: "eval",
+    pattern: "LlmAgent + rubric engine + /run/{suite} SSE",
+    models: ["gemini-3-flash-preview"],
+    difficulty: "intermediate",
+    notice: [
+      "Suites target the concierge (:8001) and HITL payout (:8006) — start them first.",
+      "Rubrics are rule-based: contains_any/_all, tools_called/_forbidden, max_total_ms.",
+      "The /run/{suite_id} endpoint streams case_started → case_result → suite_summary.",
+      "Each tile drills down into checks, tool calls, and the target's final text.",
+    ],
+    prompts: [
+      "What eval suites do you have?",
+      "Run just the off-scope refusal case from the concierge suite.",
+      "Run the high-value-needs-approval case from the payout suite.",
     ],
   },
 ];
