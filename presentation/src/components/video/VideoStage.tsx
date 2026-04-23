@@ -165,12 +165,15 @@ export function VideoStage() {
           })}
         </Canvas>
 
-        {/* Floating code card in the corner when a beat ships one */}
+        {/* Floating code card in the corner when a beat ships one.
+            Anchored top-right so it sits above the scene graph's
+            upper-right quadrant; the scene layout keeps nodes out of
+            a ~340px × 240px box in that corner. */}
         <AnimatePresence>
           {code && (
             <motion.div
               key={code.title}
-              className="absolute top-4 right-6 max-w-[420px]"
+              className="absolute top-4 right-6 w-[320px] max-w-[calc(100%-48px)]"
               initial={{ opacity: 0, x: 16 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 16 }}

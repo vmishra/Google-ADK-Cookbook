@@ -35,17 +35,23 @@ export interface NodeDef {
   tone?: "default" | "accent" | "trace" | "muted";
 }
 
+// Nodes are centred on (x, y); default size is 196 × 76. The viewBox
+// is 1000 × 640 with preserveAspectRatio=meet, so the SVG fits within
+// its container — but the `absolute` code-card overlay at top-right
+// can obscure anything past x ≈ 720. Keep the right column (tools,
+// HITL) at or below 700, and push approval below the code-card's
+// vertical extent.
 export const NODES: NodeDef[] = [
   { id: "user",         x:  110, y: 340, kind: "user",    title: "user",          subtitle: "voice · text",      kicker: "IN" },
   { id: "runner",       x:  290, y: 340, kind: "service", title: "Runner",        subtitle: "run_live",          kicker: "RUNTIME", tone: "accent" },
   { id: "session",      x:  290, y: 530, kind: "service", title: "SessionService",subtitle: "vertex-ai",         kicker: "STATE",   tone: "trace" },
   { id: "memory",       x:  110, y: 530, kind: "service", title: "MemoryService", subtitle: "memory bank",       kicker: "RECALL",  tone: "trace" },
-  { id: "coordinator",  x:  510, y: 200, kind: "agent",   title: "coordinator",   subtitle: "LlmAgent · pro",    kicker: "ROUTE",   tone: "accent" },
-  { id: "planner",      x:  510, y: 360, kind: "agent",   title: "reservations",  subtitle: "SequentialAgent",   kicker: "SPECIALIST", tone: "accent" },
-  { id: "search",       x:  720, y: 280, kind: "tool",    title: "search_rest",   subtitle: "MCP · open_table",  kicker: "TOOL",    tone: "trace" },
-  { id: "book",         x:  720, y: 440, kind: "tool",    title: "book_table",    subtitle: "long-running",      kicker: "TOOL",    tone: "trace" },
-  { id: "approval",     x:  920, y: 440, kind: "io",      title: "approval card", subtitle: "send_to_user",      kicker: "HITL",    tone: "accent" },
-  { id: "events",       x:  510, y: 540, kind: "io",      title: "event stream",  subtitle: "otel · bq · audit", kicker: "OUT" },
+  { id: "coordinator",  x:  470, y: 210, kind: "agent",   title: "coordinator",   subtitle: "LlmAgent · pro",    kicker: "ROUTE",   tone: "accent" },
+  { id: "planner",      x:  470, y: 370, kind: "agent",   title: "reservations",  subtitle: "SequentialAgent",   kicker: "SPECIALIST", tone: "accent" },
+  { id: "search",       x:  680, y: 270, kind: "tool",    title: "search_rest",   subtitle: "MCP · open_table",  kicker: "TOOL",    tone: "trace" },
+  { id: "book",         x:  680, y: 440, kind: "tool",    title: "book_table",    subtitle: "long-running",      kicker: "TOOL",    tone: "trace" },
+  { id: "approval",     x:  880, y: 540, kind: "io",      title: "approval card", subtitle: "send_to_user",      kicker: "HITL",    tone: "accent" },
+  { id: "events",       x:  470, y: 550, kind: "io",      title: "event stream",  subtitle: "otel · bq · audit", kicker: "OUT" },
   { id: "response",     x:  110, y: 200, kind: "io",      title: "response",      subtitle: "audio + transcript",kicker: "OUT",     tone: "accent" },
 ];
 
