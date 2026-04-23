@@ -1,14 +1,15 @@
-# 10 · Live video field service coach
+# 10 · Live card scanner
 
-A field-service technician points their phone camera at an
-appliance; the coach watches the stream, names the fault, and pulls
-the right spare. Uses **Gemini Live with video input** — the
-follow-on to the voice agent in chapter 03, but with `run_live()`
-consuming JPEG frames instead of PCM audio.
+Hold a credit or debit card to your camera. The agent reads the
+long number, identifies the issuing bank from the first six digits
+(the BIN), and reports the arithmetic sum of all the digits.
 
 ADK primitive on show: **`run_live()` + `LiveRequestQueue` with
-`image/jpeg` Blob frames** and TEXT response modality. Captions
-land in the portal under the live video preview at ~1 fps.
+`image/jpeg` Blob frames** and TEXT response modality.
+
+> Use a test card or your own card at your own discretion. The
+> agent explicitly ignores the CVV, expiry, and cardholder name,
+> but anything visible in frame still travels to the model.
 
 ---
 
@@ -26,24 +27,37 @@ python server.py
 Server listens on `http://127.0.0.1:8010` with a WebSocket at
 `ws://127.0.0.1:8010/ws`.
 
-In the portal, the page asks for camera permission, captures a
-frame every second, base64-encodes it, and sends it down the socket.
+---
+
+## What you'll see
+
+Output is pinned to four lines — deliberately flat, fast to read
+off a phone:
+
+```
+number  4147 0900 1234 5678
+issuer  HDFC Bank · Visa · IN
+sum     46
+luhn    ok
+```
+
+If the frame is blurry or the number is covered, the agent asks
+you to angle it or hold steadier instead of guessing.
+
+If the BIN isn't in its small table, it falls back to the network
+(Visa / Mastercard / Amex / RuPay / JCB / UnionPay) and reports
+"unknown issuer".
 
 ---
 
 ## Prompts worth trying
 
-> (point camera at an AC rating plate) — read the model and tell
-> me the common faults.
+You don't need to type anything — just hold the card to the
+camera. For typed overrides:
 
-> (point camera at a leaking washing-machine door) — what's
-> wrong, and what spare do I need?
+> read this card
 
-> (point camera at a fridge with ice on the back wall) — walk me
-> through the check.
-
-You can also type text into the composer and the coach will
-combine it with the current frame.
+> the last four are covered, can you work from the first twelve?
 
 ---
 
@@ -53,7 +67,7 @@ Browser → server (JSON over WS):
 
 | `kind` | fields | |
 |---|---|---|
-| `video` | `data` (base64 JPEG) | one frame |
+| `video` | `data` (base64 JPEG) | one frame (~1fps) |
 | `text` | `data` (string) | typed override |
 | `end` | — | close session |
 

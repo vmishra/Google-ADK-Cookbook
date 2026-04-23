@@ -288,14 +288,14 @@ export const AGENTS: AgentMeta[] = [
   {
     id: "video-coach",
     number: "10",
-    title: "Live video coach",
-    subtitle: "Field service — the agent sees what you see.",
-    kicker: "field service · live video",
+    title: "Live card scanner",
+    subtitle: "Hold a card to the camera — bank + digit sum.",
+    kicker: "live video · identification",
     summary:
-      "A technician points the camera at an appliance; the coach " +
-      "watches at ~1fps, names the fault in the catalogue's vocabulary, " +
-      "and pulls the right spare. Gemini 3.1 Flash Live preview with " +
-      "TEXT response modality — captions under a live video preview.",
+      "Point a credit or debit card at the webcam. The agent reads " +
+      "the long number, identifies the issuing bank from the BIN via a " +
+      "lookup tool, and sums the digits with a Luhn check for sanity. " +
+      "Gemini 3.1 Flash Live preview with TEXT response modality.",
     baseUrl: "http://127.0.0.1:8010",
     modality: "video",
     pattern: "LlmAgent + run_live() with image/jpeg Blob frames",
@@ -304,14 +304,14 @@ export const AGENTS: AgentMeta[] = [
     difficulty: "advanced",
     notice: [
       "The browser captures webcam at ~1fps and streams base64 JPEG over WebSocket.",
-      "Response modality is TEXT — captions, not speech. Voice is agent 03's story.",
-      "Session resumption + context-window compression carry long calls.",
-      "Two grounding tools keep the coach in the catalogue: lookup_appliance + list_spares.",
+      "Response modality is TEXT — four-line captions (number · issuer · sum · luhn).",
+      "identify_bank_by_bin does longest-prefix lookup across a small issuer table.",
+      "sum_card_digits includes a Luhn check so OCR misreads surface immediately.",
     ],
     prompts: [
-      "Point the camera at the rating plate — read the model and tell me the common faults.",
-      "Walk me through diagnosing ice on the back wall of a fridge.",
-      "This washer is dropping mid-cycle with E04 — what should I check?",
+      "Hold a card to the camera — I'll read the number, name the bank, and sum the digits.",
+      "The last four are covered — work from what you can see.",
+      "Try an Amex or a RuPay card next.",
     ],
   },
 ];

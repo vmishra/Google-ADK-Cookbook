@@ -219,8 +219,8 @@ export function VideoPanel({ baseUrl, onActive, onTurn }: Props) {
                 animate="animate"
                 className="font-[var(--font-serif)] italic text-[var(--text-muted)] text-[24px] leading-[1.35] max-w-[420px]"
               >
-                Point the camera at the appliance. The coach watches one
-                frame per second and captions what it sees.
+                Point the camera at whatever the agent should look at. One
+                frame per second is captured and captioned below.
               </motion.p>
               {error && (
                 <div
@@ -269,7 +269,7 @@ export function VideoPanel({ baseUrl, onActive, onTurn }: Props) {
                   animate="animate"
                 >
                   <div className="kicker mb-1">
-                    {line.role === "user" ? "technician" : "coach"}
+                    {line.role === "user" ? "you" : "agent"}
                   </div>
                   <motion.div
                     initial={{ opacity: 0.3 }}
@@ -283,7 +283,7 @@ export function VideoPanel({ baseUrl, onActive, onTurn }: Props) {
             </AnimatePresence>
             {transcript.length === 0 && (
               <div className="text-[13px] text-[var(--text-subtle)] italic">
-                Captions appear here as the coach narrates the frames.
+                Captions appear here as the agent narrates each frame.
               </div>
             )}
             <div className="flex flex-wrap gap-1.5 pt-2">
