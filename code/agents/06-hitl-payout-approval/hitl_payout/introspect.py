@@ -102,6 +102,19 @@ def _describe_tool(tool: Any) -> dict:
             "wraps_model": getattr(inner, "model", None),
         }
 
+    # FunctionTool / LongRunningFunctionTool — unwrap to the
+    # underlying callable so the tool name is the function name, not
+    # the wrapper class name.
+    func = getattr(tool, "func", None)
+    if callable(func) and hasattr(func, "__name__"):
+        doc = (func.__doc__ or "").strip()
+        first_para = doc.split("\n\n", 1)[0] if doc else ""
+        return {
+            "kind": "long_running" if getattr(tool, "is_long_running", False) else "function",
+            "name": func.__name__,
+            "description": first_para[:320],
+        }
+
     # Bare Python function.
     if callable(tool) and hasattr(tool, "__name__"):
         doc = (tool.__doc__ or "").strip()
