@@ -256,6 +256,35 @@ export const AGENTS: AgentMeta[] = [
       "Run the high-value-needs-approval case from the payout suite.",
     ],
   },
+  {
+    id: "mcp-knowledge-desk",
+    number: "09",
+    title: "MCP knowledge desk",
+    subtitle: "Engineering onboarding via an external MCP server.",
+    kicker: "knowledge · mcp",
+    summary:
+      "Agent with zero hand-written tools — the entire toolbox comes " +
+      "from @modelcontextprotocol/server-filesystem launched over stdio " +
+      "by the ADK MCPToolset and scoped to the cookbook's docs/ dir. " +
+      "Same shape drops in GitHub, Playwright-MCP, Slack, Linear.",
+    baseUrl: "http://127.0.0.1:8009",
+    modality: "text",
+    pattern: "LlmAgent + MCPToolset(Stdio) → npx @mcp/server-filesystem",
+    models: ["gemini-3-flash-preview"],
+    difficulty: "advanced",
+    notice: [
+      "Needs Node — the MCP server is downloaded by npx on first run.",
+      "MCP_ROOT pins the server to docs/; override to point elsewhere.",
+      "tool_filter keeps it read-only — the agent can't mutate the repo.",
+      "Architecture tab surfaces MCPToolset as an opaque handle; tool names are fs_* at call time.",
+    ],
+    prompts: [
+      "What chapters does the cookbook cover?",
+      "Show me how the evaluation chapter sets up trajectory scoring.",
+      "Where does the cookbook explain LoopAgent stopping conditions?",
+      "Does the cookbook discuss running agents on Cloud Run?",
+    ],
+  },
 ];
 
 export function findAgent(id: string): AgentMeta | undefined {

@@ -35,6 +35,7 @@ else:
     )
 
 from mcp_knowledge_desk import root_agent  # noqa: E402
+from mcp_knowledge_desk.agent import MCP_ROOT  # noqa: E402
 from mcp_knowledge_desk.metrics import MetricsStore, TurnMetrics  # noqa: E402
 from mcp_knowledge_desk.introspect import introspect  # noqa: E402
 
@@ -58,7 +59,7 @@ async def health() -> dict:
         "ok": True,
         "agent": APP_NAME,
         "model": root_agent.model,
-        "mcp_root": os.environ.get("MCP_ROOT"),
+        "mcp_root": MCP_ROOT,
     }
 
 
