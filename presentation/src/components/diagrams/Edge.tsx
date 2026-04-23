@@ -107,18 +107,35 @@ export function Edge({
         </motion.circle>
       )}
       {label && (
-        <text
-          x={cx}
-          y={cy - 8}
-          textAnchor="middle"
-          fontFamily="var(--font-mono)"
-          fontSize="10"
-          letterSpacing="1.2"
-          fill="var(--text-subtle)"
-          style={{ textTransform: "uppercase" }}
-        >
-          {label}
-        </text>
+        <g style={{ pointerEvents: "none" }}>
+          {/* Background pill so the label sits cleanly over arrows,
+              decorative curves, and other labels. Width is an
+              approximation of the uppercase string — good enough,
+              labels are short by convention. */}
+          <rect
+            x={cx - Math.max(14, label.length * 4.2)}
+            y={cy - 19}
+            width={Math.max(28, label.length * 8.4)}
+            height={16}
+            rx={3}
+            fill="var(--surface)"
+            stroke="var(--border)"
+            strokeWidth={0.5}
+            opacity={0.95}
+          />
+          <text
+            x={cx}
+            y={cy - 8}
+            textAnchor="middle"
+            fontFamily="var(--font-mono)"
+            fontSize="10"
+            letterSpacing="1.2"
+            fill="var(--text-subtle)"
+            style={{ textTransform: "uppercase" }}
+          >
+            {label}
+          </text>
+        </g>
       )}
     </g>
   );
