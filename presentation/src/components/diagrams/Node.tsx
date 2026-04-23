@@ -33,8 +33,8 @@ const kindKicker: Record<Kind, string> = {
 export function Node({
   x,
   y,
-  w = 196,
-  h = 76,
+  w = 176,
+  h = 72,
   kind = "agent",
   tone = "default",
   kicker,
