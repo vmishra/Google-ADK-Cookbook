@@ -38,24 +38,24 @@ _has_key = bool(os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_K
 _use_vertex = os.environ.get("GOOGLE_GENAI_USE_VERTEXAI", "").lower() in {"1", "true", "yes"}
 if not (_has_key or _use_vertex):
     print(
-        "[video-coach] WARNING: no GOOGLE_API_KEY / GEMINI_API_KEY. "
+        "[card-scanner] WARNING: no GOOGLE_API_KEY / GEMINI_API_KEY. "
         "Live video will fail.",
         flush=True,
     )
 else:
-    print(f"[video-coach] auth ok · vertex={_use_vertex}", flush=True)
+    print(f"[card-scanner] auth ok · vertex={_use_vertex}", flush=True)
 
-from field_service_coach import root_agent  # noqa: E402
-from field_service_coach.metrics import MetricsStore, TurnMetrics  # noqa: E402
-from field_service_coach.introspect import introspect  # noqa: E402
+from card_scanner import root_agent  # noqa: E402
+from card_scanner.metrics import MetricsStore, TurnMetrics  # noqa: E402
+from card_scanner.introspect import introspect  # noqa: E402
 
 
-APP_NAME = "video-coach"
-USER_ID = "technician"
+APP_NAME = "video-card-scanner"
+USER_ID = "cardholder"
 
 runner = InMemoryRunner(agent=root_agent, app_name=APP_NAME)
 metrics = MetricsStore()
-app = FastAPI(title="Field service video coach", version="1.0.0")
+app = FastAPI(title="Live card scanner", version="1.0.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 
