@@ -23,6 +23,24 @@ npm run dev
 
 Open http://localhost:5173.
 
+### Managed via script
+
+From the repo root, `presentation.sh` wraps the dev server with a
+PID file so it runs detached and survives your shell. It installs
+dependencies the first time (and whenever `package.json` or the
+lockfile changes).
+
+```bash
+./presentation.sh start     # install if needed, launch in background
+./presentation.sh status    # is it running? on what URL?
+./presentation.sh logs      # tail the dev server log
+./presentation.sh stop
+./presentation.sh restart
+```
+
+State lives in `presentation/.dev-server.pid` and
+`presentation/.dev-server.log`.
+
 ## Ship
 
 ```bash
