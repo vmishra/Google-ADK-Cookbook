@@ -122,8 +122,15 @@ export function VideoStage() {
 
       {/* Stage */}
       <div className="relative flex-1 min-h-0 px-4">
-        <Canvas>
-          {FLOWS.map((flow) => {
+        {/* Cap the SVG's rendered size so it doesn't balloon on tall
+            screens and push nodes off the bottom. The absolute
+            wrapper centres it in the available space; overlays
+            (code card, chips, progress bar, transport) stay on the
+            outer div so they anchor to the viewport edges. */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="relative w-full h-full max-w-[1280px] max-h-[760px] pointer-events-auto">
+            <Canvas>
+              {FLOWS.map((flow) => {
             const a = nodeById[flow.from];
             const b = nodeById[flow.to];
             if (!a || !b) return null;
@@ -163,7 +170,9 @@ export function VideoStage() {
               />
             );
           })}
-        </Canvas>
+            </Canvas>
+          </div>
+        </div>
 
         {/* Floating code card in the corner when a beat ships one.
             Anchored top-right so it sits above the scene graph's
