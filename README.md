@@ -148,10 +148,33 @@ Chapter 10, etc. Each example lists only what it needs.
 
 ## Building the site
 
-If you want to compile this cookbook to a single static site:
+Two ways to run the MkDocs site locally.
+
+### Managed via script (recommended)
+
+`docs.sh` at the repo root creates a project-local `.venv`, installs
+the pinned dependencies from `requirements.txt` on first run (or when
+`requirements.txt` changes), and runs `mkdocs serve` detached with a
+PID file so it survives your shell.
 
 ```bash
-pip install mkdocs-material mkdocs-minify-plugin
+./docs.sh start     # venv + install if needed, serve in background
+./docs.sh status    # running? on what URL?
+./docs.sh logs      # tail the mkdocs log
+./docs.sh stop
+./docs.sh restart
+./docs.sh build     # one-shot static build into site/
+```
+
+Defaults to `http://127.0.0.1:8000`. Override with `MKDOCS_PORT` or
+`MKDOCS_HOST`. State lives in `.mkdocs.pid` and `.mkdocs.log`.
+
+### Manual
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 mkdocs serve   # local preview on http://127.0.0.1:8000
 mkdocs build   # static output under site/
 ```
@@ -159,6 +182,13 @@ mkdocs build   # static output under site/
 The `mkdocs.yml` at the repo root wires up navigation, search, and the
 theme. Swap it for Docusaurus or Nextra if you prefer — the Markdown is
 framework-agnostic.
+
+### Presentation sub-app
+
+The `presentation/` directory is a separate Vite/React app. Manage it
+with the sibling [`presentation.sh`](presentation.sh) script
+(`./presentation.sh start|stop|status|logs|restart`) or follow
+[`presentation/README.md`](presentation/README.md).
 
 ---
 
