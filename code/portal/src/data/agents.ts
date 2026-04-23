@@ -193,6 +193,35 @@ export const AGENTS: AgentMeta[] = [
       "Show me everything currently pending.",
     ],
   },
+  {
+    id: "a2a-loan-desk",
+    number: "07",
+    title: "A2A loan desk",
+    subtitle: "Two processes, one decision — officer calls bureau.",
+    kicker: "lending · federation",
+    summary:
+      "A small-business loan officer on :8007 that calls BharatCredit — " +
+      "a credit bureau running in a separate process on :8017 — for a " +
+      "scoring report, then decides. The cross-process hop is the whole " +
+      "point: each agent has its own runner, metrics, and introspect.",
+    baseUrl: "http://127.0.0.1:8007",
+    modality: "deep-research",
+    pattern: "LlmAgent + httpx → remote LlmAgent peer",
+    models: ["gemini-3-flash-preview", "gemini-3.1-flash-lite-preview"],
+    toolCount: 4,
+    difficulty: "advanced",
+    notice: [
+      "Two servers, two ports — start server_bureau.py before server_officer.py.",
+      "The bureau exposes /score (LLM-free) and /chat (conversational).",
+      "request_credit_report posts to BUREAU_URL over HTTP; fails loudly if unreachable.",
+      "peer_call SSE frames mark the moment the call crosses the boundary.",
+    ],
+    prompts: [
+      "Pull APP-501 and let's work the file.",
+      "Look at APP-612. Work it end to end — bureau, EMI, decision.",
+      "APP-704 — they're asking for ₹7.5L at 30 months, business is export packaging. What's the call?",
+    ],
+  },
 ];
 
 export function findAgent(id: string): AgentMeta | undefined {
