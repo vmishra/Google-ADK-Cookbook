@@ -110,19 +110,25 @@ export function Edge({
         <g style={{ pointerEvents: "none" }}>
           {/* Background pill so the label sits cleanly over arrows,
               decorative curves, and other labels. Width is an
-              approximation of the uppercase string — good enough,
-              labels are short by convention. */}
-          <rect
-            x={cx - Math.max(14, label.length * 4.2)}
-            y={cy - 19}
-            width={Math.max(28, label.length * 8.4)}
-            height={16}
-            rx={3}
-            fill="var(--surface)"
-            stroke="var(--border)"
-            strokeWidth={0.5}
-            opacity={0.95}
-          />
+              approximation of the uppercase string at fontSize=10 +
+              letter-spacing=1.2, padded. */}
+          {(() => {
+            const chars = label.length;
+            const textW = chars * 7.2 + 16; // ~6 units per upper char + 1.2 spacing + padding
+            return (
+              <rect
+                x={cx - textW / 2}
+                y={cy - 19}
+                width={textW}
+                height={16}
+                rx={3}
+                fill="var(--surface)"
+                stroke="var(--border)"
+                strokeWidth={0.5}
+                opacity={0.95}
+              />
+            );
+          })()}
           <text
             x={cx}
             y={cy - 8}
