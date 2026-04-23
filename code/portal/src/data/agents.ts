@@ -163,6 +163,36 @@ export const AGENTS: AgentMeta[] = [
       "I'd rather skip retinol, it's too much for my skin.",
     ],
   },
+  {
+    id: "hitl-payout",
+    number: "06",
+    title: "HITL payout approval",
+    subtitle: "Human-in-the-loop + PDF voucher artifact.",
+    kicker: "finance · hitl + artifacts",
+    summary:
+      "A partner-payout desk for a fintech. Drafts vendor payouts, " +
+      "routes anything ≥ ₹50,000 to a human via a long-running tool, " +
+      "and streams a one-page PDF voucher through the artifact service " +
+      "after the money posts.",
+    baseUrl: "http://127.0.0.1:8006",
+    modality: "text",
+    pattern: "LlmAgent + LongRunningFunctionTool + ArtifactService",
+    models: ["gemini-3-flash-preview"],
+    toolCount: 8,
+    difficulty: "advanced",
+    notice: [
+      "request_approval is a LongRunningFunctionTool — session suspends on its call.",
+      "Approve / Deny buttons POST to /approve, which writes a state_delta.",
+      "Voucher PDF is saved via tool_context.save_artifact and served over HTTP.",
+      "check_approval on the resumed turn is how the agent reads the human decision.",
+    ],
+    prompts: [
+      "Draft a payout of ₹75,000 to V-207 for the October campaign retainer. GL per their master. Route to finance-controllers.",
+      "V-101 is owed ₹42,000 for last week's logistics invoices. Book it.",
+      "Draft ₹1,20,000 to V-314 for the Q3 utilities true-up, memo \"Q3 power reconciliation, contract SKY-2025-11\".",
+      "Show me everything currently pending.",
+    ],
+  },
 ];
 
 export function findAgent(id: string): AgentMeta | undefined {

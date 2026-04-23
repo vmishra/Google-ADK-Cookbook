@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { Send, Wrench, CircleDot } from "lucide-react";
+import { Send, Wrench, CircleDot, FileText, Check, X } from "lucide-react";
 
 import { streamSSE } from "@/lib/sse";
 import { chipEnter, fadeRise, spring } from "@/lib/motion";
@@ -52,12 +52,33 @@ export interface TurnMetrics {
   error?: string | null;
 }
 
+export interface PendingApproval {
+  draft_id: string;
+  approver_team?: string;
+  amount_inr?: number;
+  vendor?: { id?: string; name?: string } | null;
+  requested_at?: string;
+  decision?: "approved" | "denied"; // set once acted on
+  id: string;
+}
+
+export interface ArtifactCard {
+  filename: string;
+  version: number;
+  mime_type: string;
+  size_bytes: number;
+  download_url: string; // relative to baseUrl
+  id: string;
+}
+
 type Turn =
   | { kind: "user"; text: string }
   | {
       kind: "model";
       text: string;
       toolCalls: ToolExchange[];
+      pendingApprovals: PendingApproval[];
+      artifacts: ArtifactCard[];
       author?: string;
       complete: boolean;
       metrics?: TurnMetrics;
@@ -109,7 +130,14 @@ export function ChatPanel({ baseUrl, prompts, onActive, onAuthor, showAuthor }: 
     setTurns((t) => [
       ...t,
       { kind: "user", text },
-      { kind: "model", text: "", toolCalls: [], complete: false },
+      {
+        kind: "model",
+        text: "",
+        toolCalls: [],
+        pendingApprovals: [],
+        artifacts: [],
+        complete: false,
+      },
     ]);
     abortRef.current?.abort();
     const ac = new AbortController();
@@ -207,6 +235,50 @@ export function ChatPanel({ baseUrl, prompts, onActive, onAuthor, showAuthor }: 
             }
             return copy;
           });
+        } else if (evt.kind === "pending_approval") {
+          setTurns((arr) => {
+            const copy = [...arr];
+            const last = copy[copy.length - 1];
+            if (last?.kind === "model") {
+              copy[copy.length - 1] = {
+                ...last,
+                pendingApprovals: [
+                  ...last.pendingApprovals,
+                  {
+                    draft_id: evt.draft_id,
+                    approver_team: evt.approver_team,
+                    amount_inr: evt.amount_inr,
+                    vendor: evt.vendor,
+                    requested_at: evt.requested_at,
+                    id: crypto.randomUUID(),
+                  },
+                ],
+              };
+            }
+            return copy;
+          });
+        } else if (evt.kind === "artifact_ready") {
+          setTurns((arr) => {
+            const copy = [...arr];
+            const last = copy[copy.length - 1];
+            if (last?.kind === "model") {
+              copy[copy.length - 1] = {
+                ...last,
+                artifacts: [
+                  ...last.artifacts,
+                  {
+                    filename: evt.filename,
+                    version: evt.version,
+                    mime_type: evt.mime_type,
+                    size_bytes: evt.size_bytes,
+                    download_url: evt.download_url,
+                    id: crypto.randomUUID(),
+                  },
+                ],
+              };
+            }
+            return copy;
+          });
         } else if (evt.kind === "error") {
           setTurns((arr) => [
             ...arr,
@@ -225,6 +297,40 @@ export function ChatPanel({ baseUrl, prompts, onActive, onAuthor, showAuthor }: 
       setBusy(false);
       onActive?.(false);
       onAuthor?.(null);
+    }
+  };
+
+  const decide = async (approval: PendingApproval, decision: "approved" | "denied") => {
+    if (!sessionId) return;
+    try {
+      await fetch(`${baseUrl}/approve/${sessionId}`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          draft_id: approval.draft_id,
+          decision,
+          approver: "operator",
+        }),
+      });
+      // Mark the card as acted on so the user sees the outcome.
+      setTurns((arr) =>
+        arr.map((t) =>
+          t.kind === "model"
+            ? {
+                ...t,
+                pendingApprovals: t.pendingApprovals.map((p) =>
+                  p.id === approval.id ? { ...p, decision } : p,
+                ),
+              }
+            : t,
+        ),
+      );
+      // Inject a follow-up user turn so the agent resumes and reads
+      // the decision via check_approval.
+      const note = decision === "approved" ? "approved" : "denied";
+      send(`Approval recorded for ${approval.draft_id}: ${note}. Please continue.`);
+    } catch (e) {
+      // swallow — UI stays on the card
     }
   };
 
@@ -298,7 +404,12 @@ export function ChatPanel({ baseUrl, prompts, onActive, onAuthor, showAuthor }: 
                 ) : t.kind === "error" ? (
                   <ErrorBubble text={t.text} />
                 ) : (
-                  <ModelBubble turn={t} showAuthor={showAuthor} />
+                  <ModelBubble
+                    turn={t}
+                    showAuthor={showAuthor}
+                    baseUrl={baseUrl}
+                    onDecide={decide}
+                  />
                 )}
               </motion.div>
             ))}
@@ -371,7 +482,17 @@ function UserBubble({ text }: { text: string }) {
   );
 }
 
-function ModelBubble({ turn, showAuthor }: { turn: Extract<Turn, { kind: "model" }>; showAuthor?: boolean }) {
+function ModelBubble({
+  turn,
+  showAuthor,
+  baseUrl,
+  onDecide,
+}: {
+  turn: Extract<Turn, { kind: "model" }>;
+  showAuthor?: boolean;
+  baseUrl: string;
+  onDecide: (a: PendingApproval, d: "approved" | "denied") => void;
+}) {
   return (
     <div className="flex flex-col gap-2 max-w-[680px]">
       {showAuthor && turn.author && (
@@ -398,6 +519,12 @@ function ModelBubble({ turn, showAuthor }: { turn: Extract<Turn, { kind: "model"
       {!turn.text && turn.toolCalls.length === 0 && !turn.complete && (
         <div className="text-[13px] text-[var(--text-subtle)] italic">considering…</div>
       )}
+      {turn.pendingApprovals.map((a) => (
+        <ApprovalCard key={a.id} approval={a} onDecide={onDecide} />
+      ))}
+      {turn.artifacts.map((a) => (
+        <ArtifactChip key={a.id} artifact={a} baseUrl={baseUrl} />
+      ))}
       {(turn.metrics || turn.toolCalls.length > 0) && (
         <TurnTelemetry
           metrics={turn.metrics}
@@ -407,6 +534,127 @@ function ModelBubble({ turn, showAuthor }: { turn: Extract<Turn, { kind: "model"
       )}
     </div>
   );
+}
+
+function ApprovalCard({
+  approval,
+  onDecide,
+}: {
+  approval: PendingApproval;
+  onDecide: (a: PendingApproval, d: "approved" | "denied") => void;
+}) {
+  const decided = approval.decision;
+  return (
+    <motion.div
+      variants={fadeRise}
+      initial="initial"
+      animate="animate"
+      className="rounded-[var(--radius-lg)] border px-4 py-3"
+      style={{
+        background: decided
+          ? "color-mix(in oklab, var(--elev-1) 100%, transparent)"
+          : "color-mix(in oklab, var(--accent) 6%, var(--elev-1))",
+        borderColor: decided
+          ? "var(--border)"
+          : "color-mix(in oklab, var(--accent) 45%, transparent)",
+      }}
+    >
+      <div className="flex items-center justify-between gap-3 mb-2">
+        <div className="kicker" style={{ color: decided ? "var(--text-muted)" : "var(--accent)" }}>
+          {decided === "approved"
+            ? "approval · approved"
+            : decided === "denied"
+            ? "approval · denied"
+            : "approval pending"}
+        </div>
+        <span className="font-[var(--font-mono)] text-[11px] text-[var(--text-subtle)]">
+          {approval.draft_id}
+        </span>
+      </div>
+      <div className="flex items-baseline gap-3">
+        <div className="text-[20px] font-[var(--font-serif)]">
+          ₹ {formatInr(approval.amount_inr)}
+        </div>
+        {approval.vendor?.name && (
+          <div className="text-[13px] text-[var(--text-muted)] truncate">
+            → {approval.vendor.name}
+          </div>
+        )}
+      </div>
+      {approval.approver_team && (
+        <div className="text-[12px] text-[var(--text-subtle)] mt-1">
+          routed to <span className="font-[var(--font-mono)]">{approval.approver_team}</span>
+        </div>
+      )}
+      {!decided && (
+        <div className="flex gap-2 mt-3">
+          <button
+            type="button"
+            onClick={() => onDecide(approval, "approved")}
+            className="flex items-center gap-1.5 text-[12px] font-medium px-3 py-1.5 rounded-[var(--radius-md)] border transition-colors"
+            style={{
+              background: "color-mix(in oklab, var(--accent) 12%, transparent)",
+              borderColor: "color-mix(in oklab, var(--accent) 45%, transparent)",
+              color: "var(--text)",
+            }}
+          >
+            <Check size={13} strokeWidth={2} /> approve
+          </button>
+          <button
+            type="button"
+            onClick={() => onDecide(approval, "denied")}
+            className="flex items-center gap-1.5 text-[12px] font-medium px-3 py-1.5 rounded-[var(--radius-md)] border border-[var(--border-strong)] hover:bg-[var(--elev-2)] text-[var(--text-muted)] transition-colors"
+          >
+            <X size={13} strokeWidth={2} /> deny
+          </button>
+        </div>
+      )}
+    </motion.div>
+  );
+}
+
+function ArtifactChip({
+  artifact,
+  baseUrl,
+}: {
+  artifact: ArtifactCard;
+  baseUrl: string;
+}) {
+  const href = `${baseUrl}${artifact.download_url}`;
+  return (
+    <motion.a
+      href={href}
+      download={artifact.filename}
+      target="_blank"
+      rel="noreferrer"
+      variants={fadeRise}
+      initial="initial"
+      animate="animate"
+      className="inline-flex items-center gap-3 px-3.5 py-2.5 rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--elev-1)] hover:border-[var(--border-strong)] hover:bg-[var(--elev-2)] transition-colors max-w-[380px]"
+    >
+      <FileText size={16} strokeWidth={1.6} className="text-[var(--accent)] shrink-0" />
+      <div className="min-w-0 flex-1">
+        <div className="text-[13px] font-medium text-[var(--text)] truncate">
+          {artifact.filename}
+        </div>
+        <div className="text-[11px] text-[var(--text-subtle)] font-[var(--font-mono)]">
+          {artifact.mime_type} · {formatBytes(artifact.size_bytes)}
+        </div>
+      </div>
+      <span className="kicker text-[var(--accent)]">download</span>
+    </motion.a>
+  );
+}
+
+function formatInr(n?: number): string {
+  if (n == null) return "—";
+  return n.toLocaleString("en-IN");
+}
+
+function formatBytes(n: number): string {
+  if (n < 1024) return `${n} B`;
+  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+  return `${(n / 1024 / 1024).toFixed(2)} MB`;
 }
 
 function ErrorBubble({ text }: { text: string }) {
