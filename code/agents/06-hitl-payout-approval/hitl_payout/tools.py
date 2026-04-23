@@ -40,6 +40,9 @@ import string
 from datetime import datetime, timezone
 
 from google.adk.tools.tool_context import ToolContext
+from google.genai import types as genai_types
+
+from .voucher import render_voucher_pdf
 
 
 APPROVAL_THRESHOLD_INR = 50_000  # anything at/above this routes to a human
@@ -260,6 +263,50 @@ def list_pending(tool_context: ToolContext) -> dict:
             }
         )
     return {"items": out, "count": len(out)}
+
+
+async def generate_voucher(draft_id: str, tool_context: ToolContext) -> dict:
+    """Produce a PDF payment voucher for a posted payout and save it
+    as a session artifact.
+
+    Must only be called after `post_payout` succeeds. Writes the PDF
+    to the ADK artifact service under `voucher-{draft_id}.pdf`. The
+    server surfaces the artifact on the SSE stream so the portal can
+    render a downloadable file card.
+
+    Args:
+        draft_id: The id returned by `draft_payout`.
+
+    Returns:
+        {"artifact": filename, "version": int, "size_bytes": int}
+    """
+    store = _store(tool_context)
+    draft = store["drafts"].get(draft_id)
+    if draft is None:
+        return {"error": "draft_not_found", "draft_id": draft_id}
+    posted = store["posted"].get(draft_id)
+    if posted is None:
+        return {"error": "not_posted", "reason": "Post the payout before generating the voucher."}
+    decision = store["decisions"].get(draft_id) or {}
+    pdf_bytes = render_voucher_pdf(
+        draft=draft,
+        txn_ref=posted["txn_ref"],
+        posted_at=posted["posted_at"],
+        approver=decision.get("approver"),
+    )
+    filename = f"voucher-{draft_id}.pdf"
+    version = await tool_context.save_artifact(
+        filename=filename,
+        artifact=genai_types.Part(
+            inline_data=genai_types.Blob(data=pdf_bytes, mime_type="application/pdf"),
+        ),
+    )
+    return {
+        "artifact": filename,
+        "version": int(version),
+        "size_bytes": len(pdf_bytes),
+        "draft_id": draft_id,
+    }
 
 
 def get_payout(draft_id: str, tool_context: ToolContext) -> dict:
