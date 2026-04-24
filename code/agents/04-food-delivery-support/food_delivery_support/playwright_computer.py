@@ -95,10 +95,10 @@ class PlaywrightComputer(BaseComputer):
 
     # ---------- static metadata
 
-    def environment(self) -> ComputerEnvironment:
+    async def environment(self) -> ComputerEnvironment:
         return ComputerEnvironment.ENVIRONMENT_BROWSER
 
-    def screen_size(self) -> tuple[int, int]:
+    async def screen_size(self) -> tuple[int, int]:
         return self._size
 
     # ---------- snapshot
@@ -192,7 +192,7 @@ class PlaywrightComputer(BaseComputer):
         self, direction: Literal["up", "down", "left", "right"]
     ) -> ComputerState:
         assert self._page is not None
-        viewport = await self._page.viewport_size()
+        viewport = self._page.viewport_size
         cx = (viewport["width"] if viewport else self._size[0]) // 2
         cy = (viewport["height"] if viewport else self._size[1]) // 2
         return await self.scroll_at(cx, cy, direction, magnitude=6)
