@@ -197,6 +197,8 @@ export function VideoPanel({ baseUrl, onActive, onTurn }: Props) {
       wsRef.current.close();
       wsRef.current = null;
     }
+    setConnected(false);
+    onActive?.(false);
   };
 
   return (
