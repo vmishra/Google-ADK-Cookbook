@@ -75,6 +75,14 @@ async def get_metrics() -> dict:
     return metrics.snapshot()
 
 
+@app.post("/metrics/reset")
+async def reset_metrics() -> dict:
+    # Called by the portal on page mount so the top ribbon never shows
+    # aggregates carried over from a previous browser session.
+    metrics.reset()
+    return {"ok": True}
+
+
 @app.get("/introspect")
 async def get_introspect() -> dict:
     return introspect(root_agent)
@@ -104,7 +112,7 @@ async def _stream_chat(session_id: str, message: str) -> AsyncIterator[str]:
         async for event in runner.run_async(
             user_id=USER_ID, session_id=session_id, new_message=new_message
         ):
-            turn.record_usage(getattr(event, "usage_metadata", None))
+            turn.record_usage(event)
             turn.record_event_signals(event)
             author = event.author or root_agent.name
             for part in (event.content.parts if event.content else []):

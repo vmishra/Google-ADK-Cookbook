@@ -77,6 +77,14 @@ async def get_metrics() -> dict:
     return metrics.snapshot()
 
 
+@app.post("/metrics/reset")
+async def reset_metrics() -> dict:
+    # Called by the portal on page mount so the top ribbon never shows
+    # aggregates carried over from a previous browser session.
+    metrics.reset()
+    return {"ok": True}
+
+
 @app.get("/introspect")
 async def get_introspect() -> dict:
     return introspect(root_agent)
@@ -150,7 +158,7 @@ async def _forward_model_to_browser(
             live_request_queue=queue,
             run_config=_run_config(),
         ):
-            turn.record_usage(getattr(event, "usage_metadata", None))
+            turn.record_usage(event)
             turn.record_event_signals(event)
             for part in (event.content.parts if event.content else []):
                 if part.inline_data and part.inline_data.data:
