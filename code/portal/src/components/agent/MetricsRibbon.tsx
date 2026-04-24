@@ -35,8 +35,15 @@ interface Props {
 export function MetricsRibbon({ baseUrl }: Props) {
   const [summary, setSummary] = useState<Summary | null>(null);
 
+  // On mount (and whenever we switch agents), zero the server-side ring
+  // buffer first so the ribbon never shows aggregates carried over from
+  // a previous page-load. Only after the reset completes do we start
+  // polling — otherwise the first poll races the reset and surfaces
+  // stale numbers.
   useEffect(() => {
     let alive = true;
+    let interval: ReturnType<typeof setInterval> | null = null;
+    setSummary(null);
     const load = async () => {
       try {
         const r = await fetch(`${baseUrl}/metrics`);
@@ -47,11 +54,19 @@ export function MetricsRibbon({ baseUrl }: Props) {
         /* offline */
       }
     };
-    load();
-    const interval = setInterval(load, 3500);
+    (async () => {
+      try {
+        await fetch(`${baseUrl}/metrics/reset`, { method: "POST" });
+      } catch {
+        /* agent might be offline; polling below will surface that */
+      }
+      if (!alive) return;
+      load();
+      interval = setInterval(load, 3500);
+    })();
     return () => {
       alive = false;
-      clearInterval(interval);
+      if (interval) clearInterval(interval);
     };
   }, [baseUrl]);
 
