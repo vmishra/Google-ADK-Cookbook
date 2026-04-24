@@ -87,10 +87,14 @@ export function VoicePanel({ baseUrl, onTurn, onActive }: Props) {
       }
     };
 
-    // audio setup
+    // audio setup — a fresh AudioContext for every session, so the
+    // playhead must be reset too. Otherwise its old value (from the
+    // previous ctx's timebase) schedules the first chunk in the far
+    // future and the user hears nothing for seconds on reconnect.
     const ctx = new AudioContext({ sampleRate: 24000 });
     await ctx.audioWorklet.addModule(workletURL);
     audioCtxRef.current = ctx;
+    playheadRef.current = 0;
   };
 
   const startMic = async () => {
@@ -133,15 +137,25 @@ export function VoicePanel({ baseUrl, onTurn, onActive }: Props) {
     micStreamRef.current?.getTracks().forEach((t) => t.stop());
     micStreamRef.current = null;
     setMicOn(false);
+    onActive?.(false);
   };
 
   const stopEverything = () => {
     stopMic();
-    wsRef.current?.close();
-    wsRef.current = null;
+    if (wsRef.current) {
+      try {
+        wsRef.current.send(JSON.stringify({ kind: "end" }));
+      } catch {
+        /* socket already closed */
+      }
+      wsRef.current.close();
+      wsRef.current = null;
+    }
     audioCtxRef.current?.close();
     audioCtxRef.current = null;
+    playheadRef.current = 0;
     setConnected(false);
+    onActive?.(false);
   };
 
   const playPcmChunk = (b64: string) => {
@@ -278,15 +292,23 @@ class PcmSender extends AudioWorkletProcessor {
     merged.set(this._buffer, 0);
     merged.set(input, this._buffer.length);
     const targetLen = Math.floor(merged.length / this._ratio);
+    // Not enough samples to emit even one downsampled frame — hold on
+    // to everything and try again next tick. Without this guard the
+    // old code would slice off sample 0 of the accumulator every call,
+    // steadily dropping audio at the start of each utterance.
+    if (targetLen === 0) {
+      this._buffer = merged;
+      return true;
+    }
     const downsampled = new Int16Array(targetLen);
-    let idx = 0;
+    let lastSrcIdx = 0;
     for (let i = 0; i < targetLen; i++) {
       const srcIdx = Math.floor(i * this._ratio);
       const s = Math.max(-1, Math.min(1, merged[srcIdx]));
       downsampled[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
-      idx = srcIdx;
+      lastSrcIdx = srcIdx;
     }
-    this._buffer = merged.slice(idx + 1);
+    this._buffer = merged.slice(lastSrcIdx + 1);
     this.port.postMessage(downsampled.buffer, [downsampled.buffer]);
     return true;
   }
