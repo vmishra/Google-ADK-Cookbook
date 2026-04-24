@@ -34,6 +34,9 @@ export function VoicePanel({ baseUrl, onTurn, onActive }: Props) {
   const micStreamRef = useRef<MediaStream | null>(null);
   const workletRef = useRef<AudioWorkletNode | null>(null);
   const playheadRef = useRef<number>(0);
+  // Every scheduled PCM source lives here until it finishes playing,
+  // so we can .stop() them all when the server signals interruption.
+  const pendingSourcesRef = useRef<Set<AudioBufferSourceNode>>(new Set());
 
   useEffect(() => {
     return () => stopEverything();
@@ -63,6 +66,7 @@ export function VoicePanel({ baseUrl, onTurn, onActive }: Props) {
     ws.onmessage = (evt) => {
       let msg: any; try { msg = JSON.parse(evt.data); } catch { return; }
       if (msg.kind === "audio") playPcmChunk(msg.data);
+      else if (msg.kind === "interrupted") drainPlayback();
       else if (msg.kind === "transcript") {
         setTranscript((arr) => {
           const copy = [...arr];
@@ -142,6 +146,7 @@ export function VoicePanel({ baseUrl, onTurn, onActive }: Props) {
 
   const stopEverything = () => {
     stopMic();
+    drainPlayback();
     if (wsRef.current) {
       try {
         wsRef.current.send(JSON.stringify({ kind: "end" }));
@@ -170,8 +175,23 @@ export function VoicePanel({ baseUrl, onTurn, onActive }: Props) {
     src.connect(ctx.destination);
     const now = ctx.currentTime;
     const start = Math.max(now, playheadRef.current);
+    // Track the source so drainPlayback() can stop it on interruption.
+    // Self-unregister when it finishes naturally so the set doesn't grow.
+    pendingSourcesRef.current.add(src);
+    src.onended = () => pendingSourcesRef.current.delete(src);
     src.start(start);
     playheadRef.current = start + buf.duration;
+  };
+
+  /** Stop every scheduled PCM source and reset the playhead. Called
+      when Gemini reports interruption (user barged in) so the old
+      response doesn't bleed over the new one. */
+  const drainPlayback = () => {
+    for (const src of pendingSourcesRef.current) {
+      try { src.stop(); } catch { /* already ended */ }
+    }
+    pendingSourcesRef.current.clear();
+    playheadRef.current = audioCtxRef.current?.currentTime ?? 0;
   };
 
   return (
@@ -276,13 +296,21 @@ function arrayBufferToBase64(buf: ArrayBuffer): string {
 
 /**
  * Inline AudioWorklet: downsamples mic (usually 48k) to 16k PCM16 and
- * posts each frame's ArrayBuffer back to the main thread.
+ * posts ~20 ms chunks back to the main thread.
+ *
+ * The worklet runs every 128-sample render quantum (~2.67 ms at
+ * 48 kHz). Emitting a WebSocket message per tick floods the socket
+ * with ~375 tiny frames per second and can stutter under backpressure
+ * — so we accumulate to CHUNK_SAMPLES_16K (320 ≈ 20 ms @ 16 kHz)
+ * before posting, matching Gemini Live's recommended chunk size.
  */
 const workletSource = `
+const CHUNK_SAMPLES_16K = 320;
 class PcmSender extends AudioWorkletProcessor {
   constructor() {
     super();
     this._buffer = new Float32Array(0);
+    this._out = new Int16Array(0);
     this._ratio = sampleRate / 16000;
   }
   process(inputs) {
@@ -292,10 +320,6 @@ class PcmSender extends AudioWorkletProcessor {
     merged.set(this._buffer, 0);
     merged.set(input, this._buffer.length);
     const targetLen = Math.floor(merged.length / this._ratio);
-    // Not enough samples to emit even one downsampled frame — hold on
-    // to everything and try again next tick. Without this guard the
-    // old code would slice off sample 0 of the accumulator every call,
-    // steadily dropping audio at the start of each utterance.
     if (targetLen === 0) {
       this._buffer = merged;
       return true;
@@ -309,7 +333,20 @@ class PcmSender extends AudioWorkletProcessor {
       lastSrcIdx = srcIdx;
     }
     this._buffer = merged.slice(lastSrcIdx + 1);
-    this.port.postMessage(downsampled.buffer, [downsampled.buffer]);
+
+    // Accumulate until we have at least one 20 ms chunk, then emit in
+    // whole-chunk multiples. Any remainder stays queued for next tick.
+    const combined = new Int16Array(this._out.length + downsampled.length);
+    combined.set(this._out, 0);
+    combined.set(downsampled, this._out.length);
+    const whole = Math.floor(combined.length / CHUNK_SAMPLES_16K) * CHUNK_SAMPLES_16K;
+    if (whole > 0) {
+      const emit = combined.slice(0, whole);
+      this._out = combined.slice(whole);
+      this.port.postMessage(emit.buffer, [emit.buffer]);
+    } else {
+      this._out = combined;
+    }
     return true;
   }
 }
