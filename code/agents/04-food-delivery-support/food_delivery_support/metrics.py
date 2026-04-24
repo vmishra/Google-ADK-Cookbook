@@ -120,14 +120,31 @@ class TurnMetrics:
         if self.first_token_at is None:
             self.first_token_at = time.monotonic()
 
-    def record_usage(self, usage: Any) -> None:
-        """Pull every field off an ADK event's `usage_metadata`.
+    def record_usage(self, event: Any) -> None:
+        """Pull usage off a finalised ADK event.
 
-        google-genai field names differ slightly across SDK versions;
-        we probe defensively. Prompt + cached + tool-use are taken as
-        max (ADK reports cumulatively); candidate + thinking are summed.
-        Per-modality details are merged in by summing across events.
+        Important: we only record usage when the event is *not* partial.
+        Gemini only attaches `usage_metadata` to the final event of a
+        model call, but some SDK versions have been observed to re-emit
+        cumulative snapshots on intermediate events — summing those
+        would double-count. Each non-partial event with usage
+        corresponds to exactly one LLM call; summing across them gives
+        the true per-turn totals (critical for multi-agent / sub-agent
+        pipelines where one turn triggers several LLM calls).
+
+        `event` may be the full ADK event (preferred, so we can check
+        `partial`) or a bare `usage_metadata` object (legacy callers) —
+        both are tolerated.
         """
+        if event is None:
+            return
+        # Accept either an event object or a raw usage_metadata (back-compat).
+        if hasattr(event, "usage_metadata") or hasattr(event, "partial"):
+            if getattr(event, "partial", False):
+                return
+            usage = getattr(event, "usage_metadata", None)
+        else:
+            usage = event
         if usage is None:
             return
 
@@ -150,11 +167,14 @@ class TurnMetrics:
             "tool_use_prompt_token_count", "tool_use_prompt_tokens"
         )
 
-        self.input_tokens = max(self.input_tokens, prompt)
-        self.cached_tokens = max(self.cached_tokens, cached)
+        # All counters sum. Because we only land here on non-partial
+        # events, each call contributes one LLM call's worth of
+        # tokens — no overlap, no double-count.
+        self.input_tokens += prompt
+        self.cached_tokens += cached
         self.output_tokens += candidate
         self.thinking_tokens += thinking
-        self.tool_use_prompt_tokens = max(self.tool_use_prompt_tokens, tool_use_prompt)
+        self.tool_use_prompt_tokens += tool_use_prompt
         self.model_calls += 1
 
         # Per-modality breakdowns — list[ModalityTokenCount]
@@ -210,11 +230,23 @@ class TurnMetrics:
             + (self.thinking_tokens / 1_000_000) * out_price
         )
 
-        # tokens/sec over the streaming window (first_token → end).
+        # tokens/sec. Prefer the streaming window (first_token → end)
+        # when it's meaningfully wide. Non-streaming agents deliver
+        # text and usage_metadata on the same event, which collapses
+        # the window to microseconds and produces nonsense rates — so
+        # fall back to the full turn duration below that threshold.
         tps: float | None = None
-        if self.first_token_at:
-            window = end - self.first_token_at
-            if window > 0 and self.output_tokens > 0:
+        if self.output_tokens > 0:
+            window: float | None = None
+            if self.first_token_at is not None:
+                streamed = end - self.first_token_at
+                if streamed > 0.05:
+                    window = streamed
+            if window is None:
+                total = end - self.started_at
+                if total > 0.05:
+                    window = total
+            if window:
                 tps = round(self.output_tokens / window, 1)
 
         cache_ratio = (
@@ -266,6 +298,9 @@ class MetricsStore:
 
     def record(self, turn: TurnMetrics) -> None:
         self.turns.append(turn.as_dict())
+
+    def reset(self) -> None:
+        self.turns.clear()
 
     def summary(self) -> dict:
         turns = list(self.turns)
