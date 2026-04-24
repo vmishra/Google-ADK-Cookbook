@@ -140,9 +140,13 @@ async def _forward_browser_to_model(ws: WebSocket, queue: LiveRequestQueue) -> N
                     role="user", parts=[types.Part(text=msg["data"])]
                 ))
             elif kind == "end":
-                queue.close()
                 return
     except WebSocketDisconnect:
+        return
+    finally:
+        # Idempotent: close() on an already-closed queue is a no-op.
+        # Guarantees the peer coroutine's run_live generator can exit
+        # cleanly regardless of which side dies first.
         queue.close()
 
 
@@ -208,6 +212,12 @@ async def _forward_model_to_browser(
                 turn = TurnMetrics(model=root_agent.model)
     except WebSocketDisconnect:
         return
+    finally:
+        # If this coroutine dies first (e.g. the model stream errors),
+        # close the queue so the browser-reader coroutine's next
+        # send_realtime raises and gather() returns promptly instead
+        # of hanging on a silent receive_json().
+        queue.close()
 
 
 def _jsonable(value: Any) -> Any:
