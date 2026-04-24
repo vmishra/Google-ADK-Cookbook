@@ -187,6 +187,11 @@ async def _forward_model_to_browser(
                         "name": part.function_response.name,
                         "data": _jsonable(part.function_response.response),
                     })
+            # If Gemini decided the user barged in, tell the client so
+            # it can drain any scheduled PCM sources — otherwise the old
+            # reply keeps playing under the new one.
+            if getattr(event, "interrupted", False):
+                await ws.send_json({"kind": "interrupted"})
             # Live metric tick every event so the browser ribbon ticks.
             await ws.send_json({
                 "kind": "metrics_tick",
